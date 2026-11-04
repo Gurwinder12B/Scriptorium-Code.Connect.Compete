@@ -46,3 +46,4 @@ SCRIPTORIUM is an integrated web application combining a developer discussion co
 3. **Deterministic Sandbox Feedback:** The sandbox executes code in disposable environments with strict process, memory (128 MB), and wall-clock (5.0s) timeouts.
 4. **Idempotent Results:** Submission updates employ database transactional locking to ensure duplicate callbacks from judge workers do not double-count solve states or progress scores.
 5. **Defense in Depth:** Input validation occurs both client-side and server-side. Passwords use PBKDF2/bcrypt hashing. SQL queries strictly use SQLAlchemy ORM parameter binding.
+

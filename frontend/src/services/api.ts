@@ -194,3 +194,4 @@ export const adminApi = {
     }),
   getAuditLogs: () => request<any[]>('/admin/audit-logs'),
 };
+

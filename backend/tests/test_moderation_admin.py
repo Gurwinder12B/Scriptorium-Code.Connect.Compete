@@ -61,3 +61,4 @@ def test_admin_stats_and_role_management(client, test_admin, test_user):
     promote_res = client.patch(f"/api/v1/admin/users/{test_user.id}/role", json={"role": "moderator"}, headers=admin_headers)
     assert promote_res.status_code == 200
     assert promote_res.get_json()["data"]["role"] == "moderator"
+

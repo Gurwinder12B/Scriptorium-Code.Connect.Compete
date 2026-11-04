@@ -8,3 +8,4 @@ def get_judge_adapter() -> JudgeAdapter:
     if provider == "judge0":
         return Judge0Adapter()
     return MockJudgeAdapter()
+

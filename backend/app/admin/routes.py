@@ -65,3 +65,4 @@ def list_audit_logs():
     limit = min(request.args.get("limit", 50, type=int), 200)
     logs = AuditLog.query.order_by(AuditLog.created_at.desc()).limit(limit).all()
     return success_response(data=[l.to_dict() for l in logs])
+

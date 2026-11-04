@@ -280,3 +280,4 @@ Each process gets its own independent Python interpreter and memory space, effec
 
 if __name__ == "__main__":
     seed_database()
+

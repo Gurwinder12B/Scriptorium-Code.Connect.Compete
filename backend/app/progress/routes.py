@@ -40,3 +40,4 @@ def get_progress_summary():
         "solved_problems": [r.to_dict() for r in solved]
     }
     return success_response(data=data)
+

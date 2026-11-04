@@ -67,3 +67,4 @@ def test_get_current_user_me(client, test_user):
     assert res.status_code == 200
     data = res.get_json()
     assert data["data"]["username"] == test_user.username
+

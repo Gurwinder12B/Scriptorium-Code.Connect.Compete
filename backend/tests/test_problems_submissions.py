@@ -80,3 +80,4 @@ def test_code_submission_and_progress_tracking(client, test_user, test_admin):
     prog_data_2 = prog_res_2.get_json()["data"]
     assert prog_data_2["solved_count"] == 1
     assert prog_data_2["points"] == 10
+

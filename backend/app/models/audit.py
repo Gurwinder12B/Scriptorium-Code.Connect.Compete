@@ -53,3 +53,4 @@ class Bookmark(db.Model):
     __table_args__ = (
         db.UniqueConstraint("user_id", "target_type", "target_id", name="uq_user_bookmark"),
     )
+

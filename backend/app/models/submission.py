@@ -102,3 +102,4 @@ class UserProblemProgress(db.Model):
             "first_solved_at": self.first_solved_at.isoformat() if self.first_solved_at else None,
             "last_attempted_at": self.last_attempted_at.isoformat() if self.last_attempted_at else None
         }
+

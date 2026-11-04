@@ -119,8 +119,8 @@ export const ProblemDetailPage: React.FC = () => {
   if (error || !problem) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-xl font-bold text-slate-900 mb-2">Problem Not Found</h2>
-        <p className="text-sm text-slate-500 mb-6">{error || 'This problem might not be available.'}</p>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Problem Not Found</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{error || 'This problem might not be available.'}</p>
         <Link to="/problems" className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-semibold">
           Return to Library
         </Link>
@@ -129,19 +129,19 @@ export const ProblemDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-slate-100">
+    <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-slate-100 dark:bg-slate-950">
       {/* Top Problem Navigation & Control Bar */}
-      <div className="bg-white border-b border-slate-200 px-6 py-2.5 flex items-center justify-between shrink-0">
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-2.5 flex items-center justify-between shrink-0">
         <div className="flex items-center space-x-4">
           <Link
             to="/problems"
-            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition"
             title="Back to Problems"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-base font-bold text-slate-900">
+            <h1 className="text-base font-bold text-slate-900 dark:text-white">
               {problem.id}. {problem.title}
             </h1>
             <Badge
@@ -168,7 +168,7 @@ export const ProblemDetailPage: React.FC = () => {
           <select
             value={selectedLanguage}
             onChange={(e) => handleLanguageChange(e.target.value)}
-            className="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="python">Python 3</option>
             <option value="javascript">JavaScript (Node)</option>
@@ -177,7 +177,7 @@ export const ProblemDetailPage: React.FC = () => {
 
           <button
             onClick={handleResetCode}
-            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
+            className="p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
             title="Reset to starter template"
           >
             <RotateCcw className="w-4 h-4" />
@@ -197,15 +197,15 @@ export const ProblemDetailPage: React.FC = () => {
       {/* Main Split-Pane Workspace */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Left Pane: Problem Statement / Submissions History */}
-        <div className="w-full lg:w-1/2 bg-white border-r border-slate-200 flex flex-col overflow-hidden">
+        <div className="w-full lg:w-1/2 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden">
           {/* Statement / Submissions Tab Bar */}
-          <div className="flex border-b border-slate-200 px-6 pt-2 bg-slate-50 shrink-0">
+          <div className="flex border-b border-slate-200 dark:border-slate-800 px-6 pt-2 bg-slate-50 dark:bg-slate-950 shrink-0">
             <button
               onClick={() => setActiveTab('statement')}
               className={`px-4 py-2 text-xs font-bold border-b-2 transition ${
                 activeTab === 'statement'
-                  ? 'border-brand-600 text-brand-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-900'
+                  ? 'border-brand-600 text-brand-600 dark:text-brand-400'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               Problem Description
@@ -217,8 +217,8 @@ export const ProblemDetailPage: React.FC = () => {
               }}
               className={`px-4 py-2 text-xs font-bold border-b-2 transition ${
                 activeTab === 'submissions'
-                  ? 'border-brand-600 text-brand-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-900'
+                  ? 'border-brand-600 text-brand-600 dark:text-brand-400'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               My Submissions
@@ -229,27 +229,27 @@ export const ProblemDetailPage: React.FC = () => {
           <div className="flex-1 p-6 sm:p-8 overflow-y-auto space-y-6">
             {activeTab === 'statement' ? (
               <>
-                <div className="prose prose-slate max-w-none text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
+                <div className="prose prose-slate dark:prose-invert max-w-none text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
                   {problem.description_markdown}
                 </div>
 
                 {/* Input / Output Formats */}
-                <div className="space-y-4 pt-4 border-t border-slate-100 text-xs">
+                <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs">
                   <div>
-                    <h4 className="font-bold text-slate-900 uppercase tracking-wider mb-1">Input Format</h4>
-                    <pre className="p-3 bg-slate-50 rounded-lg text-slate-700 font-mono whitespace-pre-wrap border border-slate-200">
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider mb-1">Input Format</h4>
+                    <pre className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap border border-slate-200 dark:border-slate-800">
                       {problem.input_format}
                     </pre>
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 uppercase tracking-wider mb-1">Output Format</h4>
-                    <pre className="p-3 bg-slate-50 rounded-lg text-slate-700 font-mono whitespace-pre-wrap border border-slate-200">
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider mb-1">Output Format</h4>
+                    <pre className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap border border-slate-200 dark:border-slate-800">
                       {problem.output_format}
                     </pre>
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 uppercase tracking-wider mb-1">Constraints</h4>
-                    <pre className="p-3 bg-slate-50 rounded-lg text-slate-700 font-mono whitespace-pre-wrap border border-slate-200">
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider mb-1">Constraints</h4>
+                    <pre className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg text-slate-700 dark:text-slate-300 font-mono whitespace-pre-wrap border border-slate-200 dark:border-slate-800">
                       {problem.constraints}
                     </pre>
                   </div>
@@ -257,27 +257,27 @@ export const ProblemDetailPage: React.FC = () => {
 
                 {/* Sample Test Cases */}
                 {problem.sample_test_cases && problem.sample_test_cases.length > 0 && (
-                  <div className="space-y-4 pt-4 border-t border-slate-100">
-                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
                       Sample Test Cases
                     </h4>
                     {problem.sample_test_cases.map((tc, idx) => (
-                      <div key={tc.id} className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
-                        <p className="font-bold text-slate-700">Example {idx + 1}:</p>
+                      <div key={tc.id} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+                        <p className="font-bold text-slate-700 dark:text-slate-300">Example {idx + 1}:</p>
                         <div className="space-y-1">
                           <span className="text-slate-400 font-medium">Input:</span>
-                          <pre className="p-2 bg-white rounded border border-slate-200 font-mono text-slate-800">
+                          <pre className="p-2 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-800 font-mono text-slate-800 dark:text-slate-200">
                             {tc.input_data}
                           </pre>
                         </div>
                         <div className="space-y-1">
                           <span className="text-slate-400 font-medium">Expected Output:</span>
-                          <pre className="p-2 bg-white rounded border border-slate-200 font-mono text-slate-800">
+                          <pre className="p-2 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-800 font-mono text-slate-800 dark:text-slate-200">
                             {tc.expected_output}
                           </pre>
                         </div>
                         {tc.explanation && (
-                          <p className="text-slate-500 italic mt-1">
+                          <p className="text-slate-500 dark:text-slate-400 italic mt-1">
                             <span className="font-medium">Explanation:</span> {tc.explanation}
                           </p>
                         )}
@@ -290,14 +290,14 @@ export const ProblemDetailPage: React.FC = () => {
               /* Submissions History */
               <div className="space-y-3">
                 {userSubmissions.length === 0 ? (
-                  <p className="text-xs text-slate-500 text-center py-8">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 text-center py-8">
                     No submissions yet for this challenge.
                   </p>
                 ) : (
                   userSubmissions.map((sub) => (
                     <div
                       key={sub.id}
-                      className="p-3.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between text-xs"
+                      className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 flex items-center justify-between text-xs"
                     >
                       <div className="flex items-center gap-2.5">
                         {sub.status === 'ACCEPTED' ? (
@@ -306,7 +306,7 @@ export const ProblemDetailPage: React.FC = () => {
                           <XCircle className="w-4 h-4 text-rose-500" />
                         )}
                         <div>
-                          <p className={`font-bold ${sub.status === 'ACCEPTED' ? 'text-emerald-700' : 'text-rose-700'}`}>
+                          <p className={`font-bold ${sub.status === 'ACCEPTED' ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
                             {sub.status}
                           </p>
                           <p className="text-[10px] text-slate-400">
@@ -314,7 +314,7 @@ export const ProblemDetailPage: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right text-[11px] text-slate-500">
+                      <div className="text-right text-[11px] text-slate-500 dark:text-slate-400">
                         {sub.execution_time_ms ? `${sub.execution_time_ms} ms` : ''}
                       </div>
                     </div>
@@ -404,3 +404,4 @@ export const ProblemDetailPage: React.FC = () => {
     </div>
   );
 };
+

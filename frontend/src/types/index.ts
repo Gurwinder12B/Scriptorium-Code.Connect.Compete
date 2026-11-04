@@ -201,3 +201,4 @@ export interface SystemStats {
   submissions_count: number;
   pending_reports_count: number;
 }
+

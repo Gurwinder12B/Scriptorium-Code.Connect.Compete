@@ -31,3 +31,4 @@ def get_leaderboard():
         })
 
     return success_response(data=rankings)
+

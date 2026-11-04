@@ -121,3 +121,4 @@ class MockJudgeAdapter(JudgeAdapter):
             stdout_sample=first_sample_stdout,
             is_simulated=True
         )
+

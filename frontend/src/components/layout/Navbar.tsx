@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import {
   Code2,
   MessageSquare,
@@ -12,11 +13,13 @@ import {
   User as UserIcon,
   Menu,
   X,
-  Search,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -31,7 +34,7 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+    <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Brand Logo & Tagline */}
@@ -41,10 +44,10 @@ export const Navbar: React.FC = () => {
                 <Code2 className="w-5 h-5" />
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-lg tracking-tight text-slate-900 leading-none">
+                <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white leading-none">
                   SCRIPTORIUM
                 </span>
-                <span className="text-[10px] text-slate-400 font-medium tracking-wider uppercase">
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium tracking-wider uppercase">
                   Code. Connect. Compete.
                 </span>
               </div>
@@ -56,8 +59,8 @@ export const Navbar: React.FC = () => {
                 to="/community"
                 className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   isActive('/community')
-                    ? 'bg-slate-100 text-brand-600'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
                 }`}
               >
                 <MessageSquare className="w-4 h-4 mr-2" />
@@ -67,8 +70,8 @@ export const Navbar: React.FC = () => {
                 to="/problems"
                 className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   isActive('/problems')
-                    ? 'bg-slate-100 text-brand-600'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
                 }`}
               >
                 <Code2 className="w-4 h-4 mr-2" />
@@ -78,8 +81,8 @@ export const Navbar: React.FC = () => {
                 to="/leaderboard"
                 className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   isActive('/leaderboard')
-                    ? 'bg-slate-100 text-brand-600'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
                 }`}
               >
                 <Trophy className="w-4 h-4 mr-2" />
@@ -90,8 +93,8 @@ export const Navbar: React.FC = () => {
                   to="/dashboard"
                   className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                     isActive('/dashboard')
-                      ? 'bg-slate-100 text-brand-600'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
                   }`}
                 >
                   <LayoutDashboard className="w-4 h-4 mr-2" />
@@ -102,12 +105,25 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Right Action Area */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
+            {/* Dark / Light Mode Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-5 h-5 text-amber-400" />
+              ) : (
+                <Moon className="w-5 h-5 text-slate-600" />
+              )}
+            </button>
+
             {isAuthenticated ? (
               <div className="flex items-center space-x-3">
                 <Link
                   to="/notifications"
-                  className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition relative"
+                  className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition relative"
                   title="Notifications"
                 >
                   <Bell className="w-5 h-5" />
@@ -117,24 +133,28 @@ export const Navbar: React.FC = () => {
                 <div className="relative">
                   <button
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-slate-100 transition"
+                    className="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                   >
-                    <div className="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-sm border border-brand-200">
+                    <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-900/60 text-brand-700 dark:text-brand-300 font-bold flex items-center justify-center text-sm border border-brand-200 dark:border-brand-700">
                       {user?.username?.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-sm font-medium text-slate-700">{user?.username}</span>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                      {user?.username}
+                    </span>
                   </button>
 
                   {userDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-lg border border-slate-100 py-1.5 z-50">
-                      <div className="px-4 py-2 border-b border-slate-100">
-                        <p className="text-xs text-slate-500">Signed in as</p>
-                        <p className="text-sm font-semibold text-slate-900 truncate">{user?.email}</p>
+                    <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-slate-900 shadow-xl border border-slate-100 dark:border-slate-800 py-1.5 z-50">
+                      <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800">
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Signed in as</p>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                          {user?.email}
+                        </p>
                         <div className="mt-1 flex items-center gap-2">
-                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-slate-100 text-slate-700 uppercase tracking-wider">
+                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                             {user?.role}
                           </span>
-                          <span className="text-xs text-brand-600 font-semibold">
+                          <span className="text-xs text-brand-600 dark:text-brand-400 font-semibold">
                             {user?.profile?.points || 0} pts
                           </span>
                         </div>
@@ -143,7 +163,7 @@ export const Navbar: React.FC = () => {
                       <Link
                         to={`/profile/${user?.username}`}
                         onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        className="flex items-center px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                       >
                         <UserIcon className="w-4 h-4 mr-2.5 text-slate-400" />
                         Public Profile
@@ -153,16 +173,16 @@ export const Navbar: React.FC = () => {
                         <Link
                           to="/admin"
                           onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 font-medium"
+                          className="flex items-center px-4 py-2 text-sm text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40 font-medium"
                         >
-                          <Shield className="w-4 h-4 mr-2.5 text-purple-600" />
+                          <Shield className="w-4 h-4 mr-2.5 text-purple-600 dark:text-purple-400" />
                           Admin Console
                         </Link>
                       )}
 
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 border-t border-slate-100 mt-1"
+                        className="w-full flex items-center px-4 py-2 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border-t border-slate-100 dark:border-slate-800 mt-1"
                       >
                         <LogOut className="w-4 h-4 mr-2.5" />
                         Sign Out
@@ -175,7 +195,7 @@ export const Navbar: React.FC = () => {
               <div className="flex items-center space-x-3">
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
+                  className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
                 >
                   Log in
                 </Link>
@@ -190,10 +210,17 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex items-center md:hidden">
+          <div className="flex items-center md:hidden space-x-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+              title="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
+            </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -203,11 +230,11 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white px-4 pt-2 pb-4 space-y-1">
+        <div className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pt-2 pb-4 space-y-1">
           <Link
             to="/community"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-100"
+            className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             <MessageSquare className="w-5 h-5 mr-3 text-slate-400" />
             Community
@@ -215,7 +242,7 @@ export const Navbar: React.FC = () => {
           <Link
             to="/problems"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-100"
+            className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             <Code2 className="w-5 h-5 mr-3 text-slate-400" />
             Problems
@@ -223,7 +250,7 @@ export const Navbar: React.FC = () => {
           <Link
             to="/leaderboard"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-100"
+            className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             <Trophy className="w-5 h-5 mr-3 text-slate-400" />
             Leaderboard
@@ -233,7 +260,7 @@ export const Navbar: React.FC = () => {
               <Link
                 to="/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-100"
+                className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <LayoutDashboard className="w-5 h-5 mr-3 text-slate-400" />
                 Dashboard
@@ -243,7 +270,7 @@ export const Navbar: React.FC = () => {
                   handleLogout();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full flex items-center px-3 py-2 rounded-lg text-base font-medium text-rose-600 hover:bg-rose-50"
+                className="w-full flex items-center px-3 py-2 rounded-lg text-base font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40"
               >
                 <LogOut className="w-5 h-5 mr-3" />
                 Sign Out
@@ -254,7 +281,7 @@ export const Navbar: React.FC = () => {
               <Link
                 to="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2 text-sm font-medium text-slate-700 border border-slate-200 rounded-lg"
+                className="w-full text-center py-2 text-sm font-medium text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg"
               >
                 Log in
               </Link>

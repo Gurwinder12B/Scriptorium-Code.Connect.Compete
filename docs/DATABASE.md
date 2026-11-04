@@ -280,3 +280,4 @@ To guarantee rapid queries under production scale:
 - `problems(difficulty, is_published)` — Filtered problem catalog queries.
 - `submissions(user_id, created_at)`, `submissions(problem_id, status)` — Fast user submission history and problem statistics.
 - `user_problem_progress(user_id, status)` — Real-time progress dashboard computations.
+

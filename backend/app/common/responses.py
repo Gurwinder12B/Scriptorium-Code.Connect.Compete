@@ -19,3 +19,4 @@ def error_response(code="INTERNAL_ERROR", message="An unexpected error occurred.
         }
     }
     return jsonify(payload), status_code
+

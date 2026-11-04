@@ -41,3 +41,4 @@ def mark_all_read():
     Notification.query.filter_by(user_id=g.current_user.id, is_read=False).update({"is_read": True})
     db.session.commit()
     return success_response(data={"message": "All notifications marked as read."})
+

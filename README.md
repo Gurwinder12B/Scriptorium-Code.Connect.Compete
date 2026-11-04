@@ -87,3 +87,4 @@ When running `python seed.py`, the following demo accounts are created:
 - [System Architecture (ARCHITECTURE.md)](docs/ARCHITECTURE.md)
 - [Test Plan (TEST-PLAN.md)](docs/TEST-PLAN.md)
 - [Technical Decisions (DECISIONS.md)](docs/DECISIONS.md)
+

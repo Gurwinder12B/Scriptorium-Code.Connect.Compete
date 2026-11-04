@@ -78,16 +78,16 @@ export const AskQuestionPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Ask a Technical Question
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Be specific, share what you've tried, and provide formatted code snippets.
         </p>
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-3 text-rose-800 text-sm">
+        <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 flex items-start gap-3 text-rose-800 dark:text-rose-200 text-sm">
           <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
@@ -95,11 +95,11 @@ export const AskQuestionPage: React.FC = () => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title Card */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-          <label className="block text-sm font-bold text-slate-900">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
+          <label className="block text-sm font-bold text-slate-900 dark:text-slate-200">
             Title <span className="text-rose-500">*</span>
           </label>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Imagine asking your question to another developer. Keep it descriptive and concise.
           </p>
           <input
@@ -108,28 +108,30 @@ export const AskQuestionPage: React.FC = () => {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. How to prevent memory leaks when using closures in Node.js event listeners?"
             required
-            className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm font-medium"
+            className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm font-medium"
           />
         </div>
 
         {/* Markdown Content Card */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <label className="block text-sm font-bold text-slate-900">
+              <label className="block text-sm font-bold text-slate-900 dark:text-slate-200">
                 Detailed Explanation & Code <span className="text-rose-500">*</span>
               </label>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Provide background context and paste minimal reproducible code examples.
               </p>
             </div>
             {/* Write / Preview Tab */}
-            <div className="flex bg-slate-100 p-1 rounded-lg text-xs font-semibold">
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg text-xs font-semibold">
               <button
                 type="button"
                 onClick={() => setIsPreview(false)}
                 className={`px-3 py-1 rounded-md transition flex items-center gap-1.5 ${
-                  !isPreview ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+                  !isPreview
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400'
                 }`}
               >
                 <Edit3 className="w-3.5 h-3.5" /> Write
@@ -138,7 +140,9 @@ export const AskQuestionPage: React.FC = () => {
                 type="button"
                 onClick={() => setIsPreview(true)}
                 className={`px-3 py-1 rounded-md transition flex items-center gap-1.5 ${
-                  isPreview ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+                  isPreview
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400'
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" /> Preview
@@ -153,21 +157,21 @@ export const AskQuestionPage: React.FC = () => {
               onChange={(e) => setContentMarkdown(e.target.value)}
               placeholder="Describe your question in detail...&#10;&#10;```python&#10;# Paste code snippet here&#10;def example():&#10;    pass&#10;```"
               required
-              className="w-full p-4 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono text-sm leading-relaxed"
+              className="w-full p-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono text-sm leading-relaxed"
             />
           ) : (
-            <div className="p-6 rounded-xl border border-slate-200 bg-slate-50 min-h-[300px] text-sm whitespace-pre-wrap font-sans text-slate-800 leading-relaxed">
+            <div className="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 min-h-[300px] text-sm whitespace-pre-wrap font-sans text-slate-800 dark:text-slate-200 leading-relaxed">
               {contentMarkdown || <span className="text-slate-400 italic">No content to preview yet.</span>}
             </div>
           )}
         </div>
 
         {/* Tags Card */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-          <label className="block text-sm font-bold text-slate-900">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+          <label className="block text-sm font-bold text-slate-900 dark:text-slate-200">
             Tags (up to 5) <span className="text-rose-500">*</span>
           </label>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Add tags to help other programmers find and answer your question.
           </p>
 
@@ -175,13 +179,13 @@ export const AskQuestionPage: React.FC = () => {
             {selectedTags.map((t) => (
               <span
                 key={t}
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-semibold bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800"
               >
                 #{t}
                 <button
                   type="button"
                   onClick={() => handleRemoveTag(t)}
-                  className="hover:text-brand-900"
+                  className="hover:text-brand-900 dark:hover:text-brand-100"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -201,12 +205,12 @@ export const AskQuestionPage: React.FC = () => {
                 }
               }}
               placeholder="Type tag name and press Enter (e.g. python, algorithms)..."
-              className="flex-1 px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="flex-1 px-3.5 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
             <button
               type="button"
               onClick={() => handleAddTag(tagInput)}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition"
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold transition"
             >
               Add Tag
             </button>
@@ -220,7 +224,7 @@ export const AskQuestionPage: React.FC = () => {
                 key={t.id}
                 type="button"
                 onClick={() => handleAddTag(t.slug)}
-                className="text-xs px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 transition"
+                className="text-xs px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 transition"
               >
                 +{t.name}
               </button>
@@ -232,7 +236,7 @@ export const AskQuestionPage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate('/community')}
-            className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition"
+            className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 rounded-xl transition"
           >
             Cancel
           </button>
@@ -248,3 +252,4 @@ export const AskQuestionPage: React.FC = () => {
     </div>
   );
 };
+

@@ -208,3 +208,4 @@ All responses follow a predictable JSON schema.
 | `GET` | `/api/v1/notifications` | Authenticated | List user notifications |
 | `PATCH` | `/api/v1/notifications/:id/read` | Authenticated | Mark notification as read |
 | `POST` | `/api/v1/notifications/mark-all-read`| Authenticated | Mark all notifications read |
+

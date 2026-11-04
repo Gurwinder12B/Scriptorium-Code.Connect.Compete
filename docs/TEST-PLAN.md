@@ -38,3 +38,4 @@
 | E2E-04 | Progress & Leaderboard | Submit accepted solution -> Check Dashboard -> View Leaderboard | Problem counted in solved total, points increased |
 | E2E-05 | Moderation & Reporting | Report offensive post -> Moderator lists queue -> Moderator hides post | Post hidden from public feed, action logged in audit |
 | E2E-06 | Security Boundaries | Attempt to edit another user's answer -> Attempt admin route as regular user | Both return 403 Forbidden |
+

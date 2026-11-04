@@ -12,11 +12,9 @@ import {
   CheckCircle,
   MessageSquare,
   Flag,
-  Share2,
   Clock,
   Eye,
   Send,
-  AlertCircle,
   Check,
 } from 'lucide-react';
 
@@ -68,7 +66,6 @@ export const QuestionDetailPage: React.FC = () => {
     if (!question) return;
 
     try {
-      // Determine new vote value: toggle off if same
       let currentVal = 0;
       if (targetType === 'question') {
         currentVal = question.user_vote || 0;
@@ -173,8 +170,8 @@ export const QuestionDetailPage: React.FC = () => {
   if (error || !question) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-xl font-bold text-slate-900 mb-2">Question Not Found</h2>
-        <p className="text-sm text-slate-500 mb-6">{error || 'This question might have been deleted or moderated.'}</p>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Question Not Found</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{error || 'This question might have been deleted or moderated.'}</p>
         <Link to="/community" className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-semibold">
           Return to Community
         </Link>
@@ -185,24 +182,24 @@ export const QuestionDetailPage: React.FC = () => {
   const isAuthor = user?.id === question.author_id;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 transition-colors duration-200">
       {/* Question Header */}
-      <div className="border-b border-slate-200 pb-6">
+      <div className="border-b border-slate-200 dark:border-slate-800 pb-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             {question.title}
           </h1>
           {question.is_solved && (
             <Badge variant="success" size="md">
-              <CheckCircle className="w-4 h-4 mr-1 text-emerald-600" /> Solved
+              <CheckCircle className="w-4 h-4 mr-1 text-emerald-600 dark:text-emerald-400" /> Solved
             </Badge>
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
+        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-1.5">
-            <span className="text-slate-400">Asked by</span>
-            <Link to={`/profile/${question.author_username}`} className="font-semibold text-slate-700 hover:text-brand-600">
+            <span>Asked by</span>
+            <Link to={`/profile/${question.author_username}`} className="font-semibold text-slate-700 dark:text-slate-200 hover:text-brand-600 dark:hover:text-brand-400">
               {question.author_username}
             </Link>
           </div>
@@ -222,21 +219,25 @@ export const QuestionDetailPage: React.FC = () => {
       {/* Main Question Body with Votes */}
       <div className="flex items-start gap-6">
         {/* Voting Sidebar */}
-        <div className="flex flex-col items-center space-y-1 shrink-0 bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
+        <div className="flex flex-col items-center space-y-1 shrink-0 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           <button
             onClick={() => handleVote('question', question.id, 1)}
             className={`p-1.5 rounded-lg transition ${
-              question.user_vote === 1 ? 'bg-brand-50 text-brand-600' : 'text-slate-400 hover:text-slate-700'
+              question.user_vote === 1
+                ? 'bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400'
+                : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
             }`}
             title="Upvote question"
           >
             <ChevronUp className="w-6 h-6" />
           </button>
-          <span className="text-lg font-bold text-slate-900">{question.vote_count}</span>
+          <span className="text-lg font-bold text-slate-900 dark:text-white">{question.vote_count}</span>
           <button
             onClick={() => handleVote('question', question.id, -1)}
             className={`p-1.5 rounded-lg transition ${
-              question.user_vote === -1 ? 'bg-rose-50 text-rose-600' : 'text-slate-400 hover:text-slate-700'
+              question.user_vote === -1
+                ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
+                : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
             }`}
             title="Downvote question"
           >
@@ -245,18 +246,18 @@ export const QuestionDetailPage: React.FC = () => {
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-          <div className="prose prose-slate max-w-none text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-sans text-slate-800">
+        <div className="flex-1 bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6 transition-colors">
+          <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-sans text-slate-800 dark:text-slate-200">
             {question.content_markdown}
           </div>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100">
+          <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
             {question.tags.map((t) => (
               <Link
                 key={t.id}
                 to={`/community?tag=${t.slug}`}
-                className="text-xs px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition"
+                className="text-xs px-3 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium transition"
               >
                 #{t.name}
               </Link>
@@ -268,13 +269,13 @@ export const QuestionDetailPage: React.FC = () => {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setCommentingTarget({ type: 'question', id: question.id })}
-                className="hover:text-slate-700 transition flex items-center gap-1 font-medium"
+                className="hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center gap-1 font-medium"
               >
                 <MessageSquare className="w-3.5 h-3.5" /> Add Comment
               </button>
               <button
                 onClick={() => setReportingTarget({ type: 'question', id: question.id })}
-                className="hover:text-rose-600 transition flex items-center gap-1"
+                className="hover:text-rose-600 dark:hover:text-rose-400 transition flex items-center gap-1"
               >
                 <Flag className="w-3.5 h-3.5" /> Report
               </button>
@@ -283,10 +284,10 @@ export const QuestionDetailPage: React.FC = () => {
 
           {/* Question Comments */}
           {question.comments && question.comments.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-slate-100 space-y-2.5">
+            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2.5">
               {question.comments.map((c) => (
-                <div key={c.id} className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                  <span className="font-semibold text-slate-800 mr-2">{c.author_username}:</span>
+                <div key={c.id} className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800">
+                  <span className="font-semibold text-slate-800 dark:text-white mr-2">{c.author_username}:</span>
                   <span>{c.content}</span>
                 </div>
               ))}
@@ -297,15 +298,17 @@ export const QuestionDetailPage: React.FC = () => {
 
       {/* Answers Section */}
       <div className="space-y-6 pt-6">
-        <h2 className="text-xl font-bold text-slate-900">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
           {question.answers?.length || 0} Answers
         </h2>
 
         {question.answers?.map((ans) => (
           <div
             key={ans.id}
-            className={`bg-white p-6 sm:p-8 rounded-2xl border shadow-sm flex items-start gap-6 transition ${
-              ans.is_accepted ? 'border-emerald-300 ring-2 ring-emerald-500/10' : 'border-slate-200'
+            className={`bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border shadow-sm flex items-start gap-6 transition ${
+              ans.is_accepted
+                ? 'border-emerald-300 dark:border-emerald-800 ring-2 ring-emerald-500/10'
+                : 'border-slate-200 dark:border-slate-800'
             }`}
           >
             {/* Answer Votes */}
@@ -313,23 +316,27 @@ export const QuestionDetailPage: React.FC = () => {
               <button
                 onClick={() => handleVote('answer', ans.id, 1)}
                 className={`p-1.5 rounded-lg transition ${
-                  ans.user_vote === 1 ? 'bg-brand-50 text-brand-600' : 'text-slate-400 hover:text-slate-700'
+                  ans.user_vote === 1
+                    ? 'bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400'
+                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
               >
                 <ChevronUp className="w-6 h-6" />
               </button>
-              <span className="text-base font-bold text-slate-900">{ans.vote_count}</span>
+              <span className="text-base font-bold text-slate-900 dark:text-white">{ans.vote_count}</span>
               <button
                 onClick={() => handleVote('answer', ans.id, -1)}
                 className={`p-1.5 rounded-lg transition ${
-                  ans.user_vote === -1 ? 'bg-rose-50 text-rose-600' : 'text-slate-400 hover:text-slate-700'
+                  ans.user_vote === -1
+                    ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
+                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
               >
                 <ChevronDown className="w-6 h-6" />
               </button>
 
               {ans.is_accepted && (
-                <div className="mt-2 text-emerald-600" title="Accepted Solution">
+                <div className="mt-2 text-emerald-600 dark:text-emerald-400" title="Accepted Solution">
                   <CheckCircle className="w-7 h-7" />
                 </div>
               )}
@@ -337,7 +344,7 @@ export const QuestionDetailPage: React.FC = () => {
               {isAuthor && !ans.is_accepted && (
                 <button
                   onClick={() => handleAcceptAnswer(ans.id)}
-                  className="mt-2 p-1.5 rounded-lg text-slate-300 hover:text-emerald-600 transition"
+                  className="mt-2 p-1.5 rounded-lg text-slate-300 dark:text-slate-600 hover:text-emerald-600 dark:hover:text-emerald-400 transition"
                   title="Mark as accepted answer"
                 >
                   <Check className="w-6 h-6" />
@@ -347,29 +354,29 @@ export const QuestionDetailPage: React.FC = () => {
 
             {/* Answer Content */}
             <div className="flex-1 space-y-4">
-              <div className="prose prose-slate max-w-none text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-sans text-slate-800">
+              <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-sans text-slate-800 dark:text-slate-200">
                 {ans.content_markdown}
               </div>
 
-              <div className="flex items-center justify-between pt-4 border-t border-slate-100 text-xs text-slate-400">
+              <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400">
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setCommentingTarget({ type: 'answer', id: ans.id })}
-                    className="hover:text-slate-700 font-medium flex items-center gap-1"
+                    className="hover:text-slate-700 dark:hover:text-slate-200 font-medium flex items-center gap-1"
                   >
                     <MessageSquare className="w-3.5 h-3.5" /> Comment
                   </button>
                   <button
                     onClick={() => setReportingTarget({ type: 'answer', id: ans.id })}
-                    className="hover:text-rose-600 flex items-center gap-1"
+                    className="hover:text-rose-600 dark:hover:text-rose-400 flex items-center gap-1"
                   >
                     <Flag className="w-3.5 h-3.5" /> Report
                   </button>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-400">Answered by</span>
-                  <Link to={`/profile/${ans.author_username}`} className="font-semibold text-slate-700 hover:text-brand-600">
+                  <span>Answered by</span>
+                  <Link to={`/profile/${ans.author_username}`} className="font-semibold text-slate-700 dark:text-slate-200 hover:text-brand-600 dark:hover:text-brand-400">
                     {ans.author_username}
                   </Link>
                   <span>&bull;</span>
@@ -379,10 +386,10 @@ export const QuestionDetailPage: React.FC = () => {
 
               {/* Answer Comments */}
               {ans.comments && ans.comments.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-slate-50 space-y-2">
+                <div className="mt-3 pt-3 border-t border-slate-50 dark:border-slate-800 space-y-2">
                   {ans.comments.map((ac) => (
-                    <div key={ac.id} className="text-xs text-slate-600 bg-slate-50 p-2 rounded-lg">
-                      <span className="font-semibold text-slate-800 mr-2">{ac.author_username}:</span>
+                    <div key={ac.id} className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 p-2 rounded-lg">
+                      <span className="font-semibold text-slate-800 dark:text-white mr-2">{ac.author_username}:</span>
                       <span>{ac.content}</span>
                     </div>
                   ))}
@@ -394,10 +401,10 @@ export const QuestionDetailPage: React.FC = () => {
       </div>
 
       {/* Write Answer Form */}
-      <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-        <h3 className="text-lg font-bold text-slate-900">Your Technical Answer</h3>
+      <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 transition-colors">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Your Technical Answer</h3>
         {answerError && (
-          <div className="p-3 bg-rose-50 text-rose-800 rounded-lg text-sm border border-rose-200">
+          <div className="p-3 bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-200 rounded-lg text-sm border border-rose-200 dark:border-rose-800">
             {answerError}
           </div>
         )}
@@ -410,7 +417,7 @@ export const QuestionDetailPage: React.FC = () => {
               onChange={(e) => setNewAnswerMarkdown(e.target.value)}
               placeholder="Write your answer using clear explanations and code blocks (```language ... ```)..."
               required
-              className="w-full p-4 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono text-sm leading-relaxed"
+              className="w-full p-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono text-sm leading-relaxed"
             />
             <button
               type="submit"
@@ -422,8 +429,8 @@ export const QuestionDetailPage: React.FC = () => {
             </button>
           </form>
         ) : (
-          <div className="p-6 text-center bg-slate-50 rounded-xl border border-slate-200">
-            <p className="text-sm text-slate-600 mb-3">You must be logged in to post an answer.</p>
+          <div className="p-6 text-center bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-800">
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">You must be logged in to post an answer.</p>
             <Link to="/login" className="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-semibold">
               Log in to Answer
             </Link>
@@ -444,13 +451,13 @@ export const QuestionDetailPage: React.FC = () => {
             onChange={(e) => setCommentText(e.target.value)}
             placeholder="Keep comments concise and constructive (max 1000 characters)..."
             required
-            className="w-full p-3 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={() => setCommentingTarget(null)}
-              className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+              className="px-4 py-2 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
             >
               Cancel
             </button>
@@ -472,19 +479,19 @@ export const QuestionDetailPage: React.FC = () => {
         title="Report Content to Moderators"
       >
         {reportSuccess ? (
-          <div className="p-4 text-center text-emerald-700 bg-emerald-50 rounded-xl">
+          <div className="p-4 text-center text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl">
             <CheckCircle className="w-8 h-8 mx-auto mb-2 text-emerald-600" />
             <p className="font-semibold text-sm">Report submitted successfully.</p>
-            <p className="text-xs text-slate-500 mt-1">Our moderation team will review this content.</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Our moderation team will review this content.</p>
           </div>
         ) : (
           <form onSubmit={handleReportSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Reason</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Reason</label>
               <select
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
-                className="w-full p-2.5 rounded-lg border border-slate-300 text-sm"
+                className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm"
               >
                 <option value="spam">Spam / Advertising</option>
                 <option value="harassment">Harassment or Offensive Content</option>
@@ -493,20 +500,20 @@ export const QuestionDetailPage: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Additional Details (Optional)</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Additional Details (Optional)</label>
               <textarea
                 rows={3}
                 value={reportDetails}
                 onChange={(e) => setReportDetails(e.target.value)}
                 placeholder="Describe why this violates platform guidelines..."
-                className="w-full p-3 rounded-lg border border-slate-300 text-sm"
+                className="w-full p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm"
               />
             </div>
             <div className="flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setReportingTarget(null)}
-                className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                className="px-4 py-2 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
               >
                 Cancel
               </button>

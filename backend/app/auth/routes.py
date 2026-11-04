@@ -126,3 +126,4 @@ def logout():
 @require_auth
 def get_current_user():
     return success_response(data=g.current_user.to_dict())
+

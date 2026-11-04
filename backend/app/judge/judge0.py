@@ -132,3 +132,4 @@ class Judge0Adapter(JudgeAdapter):
             stdout_sample=stdout_sample,
             is_simulated=False
         )
+

@@ -175,3 +175,4 @@ def list_submissions():
         "total_pages": pagination.pages
     }
     return success_response(data=subs, meta=meta)
+

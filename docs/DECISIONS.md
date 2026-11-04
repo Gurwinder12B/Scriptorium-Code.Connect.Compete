@@ -66,3 +66,4 @@ During the repository and requirements audit, slight differences were identified
 - **Backend:** Python 3.10+, Flask, Flask-SQLAlchemy, Flask-Migrate, Flask-CORS, PyMySQL, Cryptography, Pytest.
 - **Database:** MySQL 8 (`utf8mb4`) with SQLite fallback for automated unit/integration tests.
 - **DevOps:** Docker Compose, multi-stage Dockerfiles, GitHub Actions compatible scripts.
+

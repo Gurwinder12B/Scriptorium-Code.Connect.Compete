@@ -26,3 +26,4 @@ class JudgeAdapter(ABC):
     @abstractmethod
     def evaluate(self, language: str, source_code: str, test_cases: list, time_limit_ms: int, memory_limit_mb: int) -> JudgeExecutionResult:
         pass
+

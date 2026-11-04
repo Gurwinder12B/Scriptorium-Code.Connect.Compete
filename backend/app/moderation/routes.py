@@ -114,3 +114,4 @@ def resolve_report():
     db.session.commit()
 
     return success_response(data={"message": f"Action '{action}' applied successfully."})
+
