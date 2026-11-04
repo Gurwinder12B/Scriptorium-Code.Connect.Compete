@@ -1,0 +1,53 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: scriptorium_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_secure_password
+      MYSQL_DATABASE: scriptorium_db
+      MYSQL_USER: scriptorium_user
+      MYSQL_PASSWORD: scriptorium_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: scriptorium_backend
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=mysql+pymysql://scriptorium_user:scriptorium_password@db:3306/scriptorium_db?charset=utf8mb4
+      - SECRET_KEY=production-secret-key-change-in-env
+      - JWT_SECRET_KEY=production-jwt-key-change-in-env
+      - JUDGE_PROVIDER=mock
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:80
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: scriptorium_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
