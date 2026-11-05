@@ -18,6 +18,7 @@ from app.models.project import (
     ReviewUpvote,
     project_tags_table,
 )
+from app.models.club import Club, ClubMember, ClubAnnouncement
 
 __all__ = [
     "User",
@@ -56,5 +57,8 @@ __all__ = [
     "ProjectUpvote",
     "ReviewUpvote",
     "project_tags_table",
+    "Club",
+    "ClubMember",
+    "ClubAnnouncement",
 ]
 

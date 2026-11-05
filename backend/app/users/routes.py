@@ -7,6 +7,7 @@ from app.models.problem import Problem
 from app.common.responses import success_response
 from app.common.errors import NotFoundError, ValidationError
 from app.common.decorators import require_auth
+from app.common.badges import calculate_user_badges
 
 users_bp = Blueprint("users", __name__, url_prefix="/api/v1/users")
 
@@ -28,6 +29,7 @@ def get_user_profile(username):
     profile_data = user.to_dict()
     profile_data["recent_questions"] = recent_questions
     profile_data["recent_answers"] = recent_answers
+    profile_data["badges"] = calculate_user_badges(user.id)
 
     return success_response(data=profile_data)
 

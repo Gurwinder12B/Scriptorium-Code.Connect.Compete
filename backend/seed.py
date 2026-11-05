@@ -575,6 +575,131 @@ EdgeGuard provides lightweight authentication and policy enforcement sidecars fo
     db.session.commit()
     print("Showcase projects and structured code reviews seeded successfully!")
 
+def _seed_clubs(admin_user, dev_user, student_user):
+    from app.models.club import Club, ClubMember, ClubAnnouncement
+
+    print("Seeding technical student clubs and campus announcements...")
+
+    c1 = Club(
+        name="Scriptorium Open Source Guild",
+        slug="scriptorium-open-source-guild",
+        tagline="Empowering students to build, maintain, and contribute to production open-source developer tools.",
+        description_markdown="""# Scriptorium Open Source Guild
+
+The Scriptorium Open Source Guild is the campus community for passionate software builders. We collaborate on shared university tooling, contribute upstream to major CNCF and Apache projects, and run hands-on systems architecture clinics.
+
+### Activities & Focus
+- **Bi-weekly Code Reviews:** Peer review student PRs and refactoring ideas.
+- **Upstream Contribution Sprints:** Mentored first PRs to popular open-source repositories.
+- **Systems Engineering:** Building distributed systems, compilers, and microservices.""",
+        category="Open Source & Systems",
+        lead_user_id=admin_user.id,
+        logo_url="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=500&auto=format&fit=crop&q=80",
+        banner_url="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&auto=format&fit=crop&q=80",
+        meeting_schedule="Every Tuesday at 6:00 PM • Innovation Lab 101",
+        member_count=48,
+        is_verified=True,
+    )
+    db.session.add(c1)
+    db.session.flush()
+
+    m1_1 = ClubMember(club_id=c1.id, user_id=admin_user.id, role="LEAD")
+    m1_2 = ClubMember(club_id=c1.id, user_id=dev_user.id, role="OFFICER")
+    m1_3 = ClubMember(club_id=c1.id, user_id=student_user.id, role="MEMBER")
+    db.session.add_all([m1_1, m1_2, m1_3])
+
+    a1_1 = ClubAnnouncement(
+        club_id=c1.id,
+        author_id=admin_user.id,
+        title="Technical Clinic: Dissecting the Linux Virtual Filesystem (VFS) in C",
+        content_markdown="Join us this Tuesday for an interactive code walkthrough where we examine file descriptors, inode trees, and write a custom in-memory RAM filesystem driver. Bring your laptop with GCC or Clang installed!",
+        announcement_type="WORKSHOP",
+        is_pinned=True,
+        rsvp_link="https://scriptorium.dev/events/vfs-clinic",
+    )
+    a1_2 = ClubAnnouncement(
+        club_id=c1.id,
+        author_id=dev_user.id,
+        title="Call for Hackathon 2026 Student Mentors & Track Leads",
+        content_markdown="We are recruiting 10 senior student mentors for the upcoming Spring Hackathon to help first-year participants debug deployments, Git workflows, and database migrations.",
+        announcement_type="RECRUITMENT",
+        is_pinned=False,
+    )
+    db.session.add_all([a1_1, a1_2])
+
+    # Club 2: Competitive Programming Guild
+    c2 = Club(
+        name="Competitive Programming Guild",
+        slug="competitive-programming-guild",
+        tagline="Master algorithmic thinking, rigorous complexity analysis, and competitive programming tournaments.",
+        description_markdown="""# Competitive Programming Guild (CPG)
+
+Dedicated to preparing collegiate teams for the ACM ICPC, Google Code Jam, and competitive algorithmic arenas.
+
+### What We Do
+- **Weekly Practice Matches:** Simulating ICPC conditions with live scoreboard freezes.
+- **Advanced DSA Lectures:** Segment trees, 2D Fenwick trees, Max Flow, Aho-Corasick, and Centroid Decomposition.""",
+        category="Competitive Programming",
+        lead_user_id=dev_user.id,
+        logo_url="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80",
+        banner_url="https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=1200&auto=format&fit=crop&q=80",
+        meeting_schedule="Every Thursday at 5:30 PM • CS Systems Lab 3",
+        member_count=64,
+        is_verified=True,
+    )
+    db.session.add(c2)
+    db.session.flush()
+
+    m2_1 = ClubMember(club_id=c2.id, user_id=dev_user.id, role="LEAD")
+    m2_2 = ClubMember(club_id=c2.id, user_id=student_user.id, role="MEMBER")
+    db.session.add_all([m2_1, m2_2])
+
+    a2_1 = ClubAnnouncement(
+        club_id=c2.id,
+        author_id=dev_user.id,
+        title="Weekly Speedrun: Segment Trees with Lazy Propagation & Range Updates",
+        content_markdown="This session covers range update optimizations in logarithmic time. We will solve 4 real past ICPC Regional problems together in C++20 and Python 3.14.",
+        announcement_type="WORKSHOP",
+        is_pinned=True,
+        rsvp_link="https://scriptorium.dev/problems",
+    )
+    db.session.add(a2_1)
+
+    # Club 3: AI & Cognitive Systems
+    c3 = Club(
+        name="AI & Cognitive Systems Society",
+        slug="ai-and-cognitive-systems-society",
+        tagline="Exploring transformer architectures, multimodal models, LLM agents, and neuro-symbolic reasoning.",
+        description_markdown="""# AI & Cognitive Systems Society (AICS)
+
+A student-led research and development group focusing on generative intelligence, neural sound synthesis, and real-time inference on edge devices.""",
+        category="AI & Machine Learning",
+        lead_user_id=student_user.id,
+        logo_url="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=500&auto=format&fit=crop&q=80",
+        meeting_schedule="Alternate Saturdays at 11:00 AM • Seminar Hall B",
+        member_count=52,
+        is_verified=True,
+    )
+    db.session.add(c3)
+    db.session.flush()
+
+    m3_1 = ClubMember(club_id=c3.id, user_id=student_user.id, role="LEAD")
+    m3_2 = ClubMember(club_id=c3.id, user_id=dev_user.id, role="OFFICER")
+    db.session.add_all([m3_1, m3_2])
+
+    a3_1 = ClubAnnouncement(
+        club_id=c3.id,
+        author_id=student_user.id,
+        title="Hands-On Workshop: LoRA Fine-Tuning on University GPU Nodes",
+        content_markdown="Learn how Low-Rank Adaptation (LoRA) reduces trainable parameter counts by 99% while maintaining benchmark precision. We will fine-tune an open-source model on student code datasets.",
+        announcement_type="WORKSHOP",
+        is_pinned=True,
+    )
+    db.session.add(a3_1)
+
+    db.session.commit()
+    print("Clubs and announcements seeded successfully!")
+
 def seed_database():
     app = create_app("development")
     with app.app_context():
@@ -585,6 +710,7 @@ def seed_database():
             from app.models.event import Event
             from app.models.blog import BlogPost
             from app.models.project import Project
+            from app.models.club import Club
             admin_user = User.query.filter_by(username="admin").first()
             dev_user = User.query.filter_by(username="developer").first()
             student_user = User.query.filter_by(username="student").first()
@@ -600,6 +726,10 @@ def seed_database():
             if not Project.query.first():
                 print("Seeding missing projects into existing database...")
                 _seed_projects(admin_user, dev_user, student_user)
+
+            if not Club.query.first():
+                print("Seeding missing technical clubs into existing database...")
+                _seed_clubs(admin_user, dev_user, student_user)
 
             print("Database check complete. Skipping main user seed.")
             return
@@ -867,7 +997,8 @@ Each process gets its own independent Python interpreter and memory space, effec
         _seed_events(created_users["admin"], created_users["developer"])
         _seed_blogs(created_users["admin"], created_users["developer"], created_users["student"])
         _seed_projects(created_users["admin"], created_users["developer"], created_users["student"])
-        print("Database seeded successfully with demo users, tags, problems, test cases, events, blogs, and showcase projects!")
+        _seed_clubs(created_users["admin"], created_users["developer"], created_users["student"])
+        print("Database seeded successfully with demo users, tags, problems, test cases, events, blogs, showcase projects, and technical clubs!")
 
 if __name__ == "__main__":
     seed_database()

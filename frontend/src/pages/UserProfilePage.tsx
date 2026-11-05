@@ -19,6 +19,10 @@ import {
   BookOpen,
   Clock,
   Heart,
+  Award,
+  Zap,
+  FolderGit2,
+  ShieldCheck,
 } from 'lucide-react';
 
 export const UserProfilePage: React.FC = () => {
@@ -282,6 +286,40 @@ export const UserProfilePage: React.FC = () => {
               <span className="font-bold text-slate-900 dark:text-white">{p.answers_count || 0}</span>
             </div>
           </div>
+
+          {/* Genuine Verified Badges & Recognitions */}
+          {profileData.badges && profileData.badges.length > 0 && (
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                <Award className="w-4 h-4 text-amber-500" />
+                Verified Badges ({profileData.badges.length})
+              </h3>
+              <div className="space-y-2">
+                {profileData.badges.map((b: any) => (
+                  <div
+                    key={b.id}
+                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-800 space-y-1"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+                        {b.name}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-400">
+                        {b.tier}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+                      {b.description}
+                    </p>
+                    <div className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 pt-0.5">
+                      ✓ {b.metric}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

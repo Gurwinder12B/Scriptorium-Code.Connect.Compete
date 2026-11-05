@@ -411,3 +411,28 @@ export const projectsApi = {
     }),
 };
 
+export const clubsApi = {
+  getClubs: (params: { category?: string; q?: string } = {}) => {
+    const searchParams = new URLSearchParams();
+    if (params.category) searchParams.set('category', params.category);
+    if (params.q) searchParams.set('q', params.q);
+    return request<any>(`/clubs?${searchParams.toString()}`);
+  },
+  getClub: (idOrSlug: string | number) => request<any>(`/clubs/${idOrSlug}`),
+  createClub: (data: any) =>
+    request<any>('/clubs', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  toggleJoin: (clubId: number) =>
+    request<{ user_is_member: boolean; member_count: number }>(`/clubs/${clubId}/join`, {
+      method: 'POST',
+    }),
+  getAnnouncementsFeed: () => request<any[]>('/clubs/announcements/feed'),
+  createAnnouncement: (clubId: number, data: any) =>
+    request<any>(`/clubs/${clubId}/announcements`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+

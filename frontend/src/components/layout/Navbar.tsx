@@ -19,6 +19,7 @@ import {
   BookOpen,
   CalendarDays,
   FolderGit2,
+  Users,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -113,6 +114,17 @@ export const Navbar: React.FC = () => {
               >
                 <FolderGit2 className="w-4 h-4 mr-2" />
                 Showcase
+              </Link>
+              <Link
+                to="/clubs"
+                className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                  isActive('/clubs')
+                    ? 'bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Clubs
               </Link>
               <Link
                 to="/leaderboard"
@@ -318,6 +330,14 @@ export const Navbar: React.FC = () => {
           >
             <FolderGit2 className="w-5 h-5 mr-3 text-slate-400" />
             Showcase
+          </Link>
+          <Link
+            to="/clubs"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <Users className="w-5 h-5 mr-3 text-slate-400" />
+            Clubs
           </Link>
           <Link
             to="/leaderboard"

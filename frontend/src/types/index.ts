@@ -428,3 +428,67 @@ export interface ProjectItem {
   reviews?: CodeReviewItem[];
 }
 
+export interface UserBadgeItem {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  tier: 'Bronze' | 'Silver' | 'Gold' | 'Diamond';
+  metric: string;
+}
+
+export interface ClubAnnouncementItem {
+  id: number;
+  club_id: number;
+  club_name?: string;
+  club_slug?: string;
+  title: string;
+  content_markdown: string;
+  announcement_type: 'WORKSHOP' | 'HACKATHON_CALL' | 'RECRUITMENT' | 'GENERAL';
+  is_pinned: boolean;
+  rsvp_link?: string;
+  created_at: string;
+  author?: {
+    id: number;
+    username: string;
+    role: string;
+    avatar_url?: string;
+  };
+}
+
+export interface ClubMemberItem {
+  id: number;
+  club_id: number;
+  user_id: number;
+  username: string;
+  role: 'LEAD' | 'OFFICER' | 'MEMBER';
+  avatar_url?: string;
+  joined_at: string;
+}
+
+export interface ClubItem {
+  id: number;
+  name: string;
+  slug: string;
+  tagline: string;
+  description_markdown?: string;
+  category: string;
+  logo_url?: string;
+  banner_url?: string;
+  meeting_schedule?: string;
+  member_count: number;
+  is_verified: boolean;
+  created_at: string;
+  lead?: {
+    id: number;
+    username: string;
+    role: string;
+    avatar_url?: string;
+  };
+  user_is_member?: boolean;
+  user_role?: 'LEAD' | 'OFFICER' | 'MEMBER' | null;
+  announcements?: ClubAnnouncementItem[];
+  officers?: ClubMemberItem[];
+}
+
