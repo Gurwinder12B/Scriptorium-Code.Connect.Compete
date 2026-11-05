@@ -209,3 +209,84 @@ All responses follow a predictable JSON schema.
 | `PATCH` | `/api/v1/notifications/:id/read` | Authenticated | Mark notification as read |
 | `POST` | `/api/v1/notifications/mark-all-read`| Authenticated | Mark all notifications read |
 
+---
+
+### 3.10 Media Storage & Uploads (`/api/v1/media`)
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/api/v1/media/upload` | Authenticated | Multi-part media upload with magic-byte validation |
+| `GET` | `/api/v1/media/uploads/<filename>` | Public | Serve verified media file securely |
+
+---
+
+### 3.11 Event Media & Memories (`/api/v1/events`)
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/v1/events` | Public | List and search events with category and year filters |
+| `POST` | `/api/v1/events` | Moderator/Admin | Create a new community event |
+| `GET` | `/api/v1/events/:id_or_slug` | Public | Get event detail, albums, media, and highlights |
+| `PUT` | `/api/v1/events/:id` | Moderator/Admin | Update event details |
+| `POST` | `/api/v1/events/:id/albums` | Moderator/Admin | Create an album within an event |
+| `POST` | `/api/v1/events/:id/media` | Moderator/Admin | Add photo/video media with captions to an event album |
+| `DELETE` | `/api/v1/events/:id/media/:media_id` | Moderator/Admin | Remove a media item from an event |
+
+---
+
+### 3.12 Student Blogs & Editorial Management (`/api/v1/blogs`)
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/v1/blogs` | Public | List published articles with category and search filter |
+| `POST` | `/api/v1/blogs` | Authenticated | Create a new student blog post (draft or submit for review) |
+| `GET` | `/api/v1/blogs/:id_or_slug` | Public | Get blog post content, comments, and author profile |
+| `PUT` | `/api/v1/blogs/:id` | Author/Admin | Update blog post |
+| `DELETE` | `/api/v1/blogs/:id` | Author/Admin | Delete blog post |
+| `POST` | `/api/v1/blogs/:id/like` | Authenticated | Toggle like on a blog post |
+| `POST` | `/api/v1/blogs/:id/comments` | Authenticated | Add discussion comment to a blog post |
+| `GET` | `/api/v1/blogs/categories` | Public | List all available blog categories |
+| `POST` | `/api/v1/blogs/categories` | Admin | Create a new blog category |
+| `GET` | `/api/v1/blogs/editorial/calendar` | Admin/Moderator | Query editorial review queue, drafts, and cadence gap warnings |
+| `PATCH` | `/api/v1/blogs/editorial/:id/status` | Admin/Moderator | Approve, schedule, reject, or request changes on blog post |
+
+---
+
+### 3.13 Project Showcase & Peer Code Reviews (`/api/v1/projects`)
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/v1/projects` | Public | Browse showcase projects with search, tag, and sort filters |
+| `POST` | `/api/v1/projects` | Authenticated | Submit project with demo URL, repo, tech stack tags, and media |
+| `GET` | `/api/v1/projects/:id_or_slug` | Public | Get project details, screenshots, metrics, and peer reviews |
+| `PUT` | `/api/v1/projects/:id` | Owner/Admin | Update project details |
+| `DELETE` | `/api/v1/projects/:id` | Owner/Admin | Remove showcase project |
+| `POST` | `/api/v1/projects/:id/upvote` | Authenticated | Toggle upvote on a project |
+| `GET` | `/api/v1/projects/:id/reviews` | Public | List peer code reviews for a project |
+| `POST` | `/api/v1/projects/:id/reviews` | Authenticated | Submit 4-pillar structured peer review (Architecture, Performance, Security, UI/UX) |
+| `PATCH` | `/api/v1/projects/reviews/:review_id/status` | Author/Owner | Update review resolution status (`OPEN`, `ADDRESSED`, `RESOLVED`) |
+| `POST` | `/api/v1/projects/reviews/:review_id/comments` | Authenticated | Add threaded inline code comment to review |
+| `POST` | `/api/v1/projects/reviews/:review_id/upvote` | Authenticated | Upvote helpful code review |
+
+---
+
+### 3.14 Technical Clubs & Announcements (`/api/v1/clubs`)
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/v1/clubs` | Public | List active clubs with member count and tags |
+| `POST` | `/api/v1/clubs` | Admin | Register new official student technical club |
+| `GET` | `/api/v1/clubs/:id_or_slug` | Public | Club details, officers, member directory, and announcements |
+| `POST` | `/api/v1/clubs/:id/membership` | Authenticated | Toggle club membership (join/leave) |
+| `GET` | `/api/v1/clubs/:id/announcements` | Public | Feed of club announcements and updates |
+| `POST` | `/api/v1/clubs/:id/announcements` | Officer/Admin | Broadcast pinned or standard announcement to members |
+
+---
+
+### 3.15 AI Mentor Progressive Hints (`/api/v1/problems`)
+
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/v1/problems/:id_or_slug/hints` | Public | Fetch progressive 4-level pedagogical hints (Intuition, Approach, Pitfalls, Pseudo-Code) without exposing full solution |
+
+
