@@ -16,6 +16,8 @@ import {
   Sun,
   Moon,
   Camera,
+  BookOpen,
+  CalendarDays,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -88,6 +90,17 @@ export const Navbar: React.FC = () => {
               >
                 <Camera className="w-4 h-4 mr-2" />
                 Event Media
+              </Link>
+              <Link
+                to="/blogs"
+                className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                  isActive('/blogs')
+                    ? 'bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                Blogs
               </Link>
               <Link
                 to="/leaderboard"
@@ -181,6 +194,17 @@ export const Navbar: React.FC = () => {
                         Public Profile
                       </Link>
 
+                      {(user?.role === 'admin' || user?.role === 'moderator' || user?.role === 'editor') && (
+                        <Link
+                          to="/blogs/editorial"
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="flex items-center px-4 py-2 text-sm text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 font-medium"
+                        >
+                          <CalendarDays className="w-4 h-4 mr-2.5 text-emerald-600 dark:text-emerald-400" />
+                          Editorial Desk
+                        </Link>
+                      )}
+
                       {(user?.role === 'admin' || user?.role === 'moderator') && (
                         <Link
                           to="/admin"
@@ -266,6 +290,14 @@ export const Navbar: React.FC = () => {
           >
             <Camera className="w-5 h-5 mr-3 text-slate-400" />
             Event Media
+          </Link>
+          <Link
+            to="/blogs"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <BookOpen className="w-5 h-5 mr-3 text-slate-400" />
+            Blogs
           </Link>
           <Link
             to="/leaderboard"

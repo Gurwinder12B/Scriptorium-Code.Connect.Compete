@@ -22,6 +22,10 @@ import { NotificationsPage } from './pages/NotificationsPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { EventGalleryPage } from './pages/EventGalleryPage';
 import { EventDetailPage } from './pages/EventDetailPage';
+import { BlogDiscoveryPage } from './pages/BlogDiscoveryPage';
+import { BlogDetailPage } from './pages/BlogDetailPage';
+import { BlogEditorPage } from './pages/BlogEditorPage';
+import { EditorialCalendarPage } from './pages/EditorialCalendarPage';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode; requiredRole?: string[] }> = ({
@@ -75,6 +79,8 @@ export const App: React.FC = () => {
                 <Route path="/problems/:id" element={<ProblemDetailPage />} />
                 <Route path="/events" element={<EventGalleryPage />} />
                 <Route path="/events/:id" element={<EventDetailPage />} />
+                <Route path="/blogs" element={<BlogDiscoveryPage />} />
+                <Route path="/blogs/:id" element={<BlogDetailPage />} />
                 <Route path="/profile/:username" element={<UserProfilePage />} />
                 <Route path="/leaderboard" element={<LeaderboardPage />} />
 
@@ -84,6 +90,22 @@ export const App: React.FC = () => {
                   element={
                     <ProtectedRoute>
                       <AskQuestionPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/blogs/write"
+                  element={
+                    <ProtectedRoute>
+                      <BlogEditorPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/blogs/edit/:id"
+                  element={
+                    <ProtectedRoute>
+                      <BlogEditorPage />
                     </ProtectedRoute>
                   }
                 />
@@ -105,6 +127,14 @@ export const App: React.FC = () => {
                 />
 
                 {/* Admin & Moderation Routes */}
+                <Route
+                  path="/blogs/editorial"
+                  element={
+                    <ProtectedRoute requiredRole={['admin', 'moderator', 'editor']}>
+                      <EditorialCalendarPage />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path="/admin"
                   element={

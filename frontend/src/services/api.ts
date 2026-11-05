@@ -261,3 +261,71 @@ export const eventsApi = {
     }),
 };
 
+export const blogsApi = {
+  getBlogs: (params: {
+    category?: string;
+    tag?: string;
+    author?: string;
+    q?: string;
+    sort?: string;
+    featured?: boolean;
+    editors_pick?: boolean;
+    status?: string;
+    page?: number;
+    per_page?: number;
+  } = {}) => {
+    const searchParams = new URLSearchParams();
+    if (params.category) searchParams.set('category', params.category);
+    if (params.tag) searchParams.set('tag', params.tag);
+    if (params.author) searchParams.set('author', params.author);
+    if (params.q) searchParams.set('q', params.q);
+    if (params.sort) searchParams.set('sort', params.sort);
+    if (params.featured) searchParams.set('featured', 'true');
+    if (params.editors_pick) searchParams.set('editors_pick', 'true');
+    if (params.status) searchParams.set('status', params.status);
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.per_page) searchParams.set('per_page', String(params.per_page));
+    return request<any>(`/blogs?${searchParams.toString()}`);
+  },
+  getCategories: () => request<any[]>('/blogs/categories'),
+  createCategory: (data: { name: string; description?: string }) =>
+    request<any>('/blogs/categories', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  getBlog: (idOrSlug: string | number) => request<any>(`/blogs/${idOrSlug}`),
+  createBlog: (data: any) =>
+    request<any>('/blogs', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateBlog: (id: number, data: any) =>
+    request<any>(`/blogs/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  deleteBlog: (id: number) =>
+    request<any>(`/blogs/${id}`, {
+      method: 'DELETE',
+    }),
+  toggleLike: (id: number) =>
+    request<{ like_count: number; user_has_liked: boolean }>(`/blogs/${id}/like`, {
+      method: 'POST',
+    }),
+  toggleBookmark: (id: number) =>
+    request<{ user_has_bookmarked: boolean }>(`/blogs/${id}/bookmark`, {
+      method: 'POST',
+    }),
+  addComment: (id: number, data: { content: string; parent_id?: number }) =>
+    request<any>(`/blogs/${id}/comments`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  getEditorialCalendar: () => request<any>('/blogs/editorial/calendar'),
+  moderateBlog: (id: number, data: { action: string; reason?: string; scheduled_at?: string }) =>
+    request<any>(`/blogs/${id}/moderate`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+

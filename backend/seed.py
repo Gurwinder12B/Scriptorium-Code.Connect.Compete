@@ -190,6 +190,204 @@ Problems ranged from dynamic programming with bitmasks to segment trees and max 
     db.session.commit()
     print("Events seeded successfully!")
 
+def _seed_blogs(admin_user, dev_user, student_user):
+    from app.models.blog import BlogCategory, BlogTag, BlogPost, BlogComment
+    from datetime import datetime, timezone, timedelta
+
+    print("Seeding blog categories and technical student articles...")
+    categories_def = [
+        ("Programming", "Core programming paradigms, syntax, idioms, and standard libraries"),
+        ("Python", "Python 3 internals, concurrency, async programming, and ecosystem tools"),
+        ("Web Development", "Modern frontend, backend architectures, APIs, and microservices"),
+        ("Artificial Intelligence", "Neural networks, transformer models, LLMs, and agentic workflows"),
+        ("Data Structures & Algorithms", "Algorithmic thinking, graph traversals, complexity, and problem solving"),
+        ("System Design", "Scalability, caching, distributed transactions, and database indexing"),
+        ("Career Guidance", "Technical interviews, resume strategies, and developer roadmaps"),
+        ("Project Experiences", "Lessons learned building production web services and open-source tools"),
+    ]
+
+    cat_map = {}
+    for index, (c_name, c_desc) in enumerate(categories_def):
+        c_slug = c_name.lower().replace(" & ", "-").replace(" ", "-")
+        cat = BlogCategory.query.filter_by(slug=c_slug).first()
+        if not cat:
+            cat = BlogCategory(
+                name=c_name,
+                slug=c_slug,
+                description=c_desc,
+                display_order=index,
+                is_active=True
+            )
+            db.session.add(cat)
+            db.session.flush()
+        cat_map[c_slug] = cat
+
+    now = datetime.now(timezone.utc)
+
+    # Article 1: Python Memory & GIL
+    post1 = BlogPost(
+        author_id=dev_user.id,
+        category_id=cat_map["python"].id,
+        title="Deep Dive into Memory Management and Garbage Collection in Python 3.14",
+        slug="deep-dive-into-memory-management-and-garbage-collection-in-python",
+        excerpt="An architectural exploration of reference counting, cyclic garbage collection, and how PEP 703 free-threading transforms memory barriers in modern CPython.",
+        content_markdown="""# Deep Dive into Python Memory Management
+
+Python's memory management model is both elegant and deceptively sophisticated. While high-level developers rarely need to invoke `malloc()` or `free()`, understanding how CPython manages memory is crucial for building high-throughput, low-latency backends.
+
+## 1. Reference Counting: The First Line of Defense
+
+Every object in CPython contains a header defined by `PyObject`:
+```c
+struct _object {
+    _PyObject_HEAD_EXTRA
+    Py_ssize_t ob_refcnt;
+    struct _typeobject *ob_type;
+};
+```
+Whenever an object is referenced, its `ob_refcnt` is incremented. When references fall out of scope, the counter decrements. As soon as `ob_refcnt == 0`, memory is deallocated immediately.
+
+## 2. Cyclic Garbage Collection
+
+Reference counting alone cannot handle self-referential cycles:
+```python
+class Node:
+    def __init__(self):
+        self.neighbor = None
+
+a = Node()
+b = Node()
+a.neighbor = b
+b.neighbor = a
+
+del a
+del b
+# Both objects still have refcnt == 1!
+```
+To solve this, CPython runs a **generational cyclic garbage collector** that categorizes objects into three generations (Gen 0, Gen 1, Gen 2) based on survival cycles.
+
+## 3. PEP 703: The Free-Threaded Future
+With Python 3.13 and 3.14, the Global Interpreter Lock (GIL) is becoming optional through mimalloc and biased reference counting. This allows true multi-core thread scaling across multiple CPUs without process boundaries!""",
+        cover_image_url="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&auto=format&fit=crop&q=80",
+        reading_time_minutes=4,
+        status="PUBLISHED",
+        is_featured=True,
+        is_editors_pick=False,
+        view_count=184,
+        like_count=29,
+        comment_count=2,
+        published_at=now - timedelta(days=2),
+    )
+    db.session.add(post1)
+    db.session.flush()
+
+    # Article 2: Real-time Web & CRDTs
+    post2 = BlogPost(
+        author_id=dev_user.id,
+        category_id=cat_map["web-development"].id,
+        title="Building Resilient Real-Time Collaborative Web Applications with WebSockets and CRDTs",
+        slug="building-resilient-realtime-collaborative-web-applications-crdts",
+        excerpt="Learn how Conflict-free Replicated Data Types (CRDTs) enable multi-user collaborative editors without locking servers or suffering merge conflicts.",
+        content_markdown="""# Collaborative Web Architecture with CRDTs
+
+Building collaborative software like Google Docs, Figma, or interactive code editors requires managing concurrent edits from multiple network clients without centralized mutex locks.
+
+## Why Operational Transformation (OT) is Hard
+Traditional solutions relied on Operational Transformation (OT), which requires a central coordinating server to sequence and transform every keystroke relative to concurrent operations. If the server loses packets, the state diverges.
+
+## The CRDT Solution
+**Conflict-free Replicated Data Types (CRDTs)** guarantee *strong eventual consistency*. Any two nodes that have received the same set of updates (regardless of order) will independently converge to the exact same document state!
+
+```typescript
+// Sample State-based CRDT LWW-Element-Set
+interface LWWRegister<T> {
+  value: T;
+  timestamp: number;
+}
+
+function mergeRegister<T>(local: LWWRegister<T>, remote: LWWRegister<T>): LWWRegister<T> {
+  return remote.timestamp > local.timestamp ? remote : local;
+}
+```
+
+Combining state-based CRDTs with binary WebSocket frames gives sub-20ms collaboration speed with zero lock contention!""",
+        cover_image_url="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&auto=format&fit=crop&q=80",
+        reading_time_minutes=5,
+        status="PUBLISHED",
+        is_featured=False,
+        is_editors_pick=True,
+        view_count=142,
+        like_count=21,
+        comment_count=1,
+        published_at=now - timedelta(days=4),
+    )
+    db.session.add(post2)
+    db.session.flush()
+
+    # Article 3: DSA Mental Model
+    post3 = BlogPost(
+        author_id=student_user.id,
+        category_id=cat_map["data-structures-algorithms"].id,
+        title="From LeetCode Beginner to Dynamic Programming Mastery: A Step-by-Step Mental Model",
+        slug="from-leetcode-beginner-to-dynamic-programming-mastery",
+        excerpt="A friendly, pattern-oriented guide for students demystifying state transitions, recurrence relations, and memoization vs bottom-up tabulation.",
+        content_markdown="""# Mastering Dynamic Programming
+
+Dynamic Programming (DP) is often perceived as the most intimidating category in competitive programming. However, once you recognize the underlying pattern, almost all DP problems follow a 4-step framework.
+
+## The 4-Step DP Framework
+1. **Identify the State:** What minimal set of variables uniquely defines the subproblem? (e.g., `(index, remaining_capacity)` in Knapsack).
+2. **Formulate the Recurrence:** How does the answer for state `i` depend on previous states `i - 1`, `i - 2`?
+3. **Establish Base Cases:** What is the answer when indices hit 0 or boundary conditions?
+4. **Choose Top-Down Memoization or Bottom-Up Tabulation:**
+   - **Memoization (Recursion + Hash Map / Array):** Intuitive and only calculates reachable states.
+   - **Tabulation (Iterative):** Eliminates call stack overhead and enables memory optimization via state compression.
+
+```python
+# Fibonacci with O(1) Space Tabulation
+def fibonacci(n: int) -> int:
+    if n <= 1:
+        return n
+    prev2, prev1 = 0, 1
+    for _ in range(2, n + 1):
+        prev2, prev1 = prev1, prev2 + prev1
+    return prev1
+```
+
+Start with 1D DP (Climbing Stairs, House Robber) before advancing to 2D DP (Unique Paths, Longest Common Subsequence)!""",
+        cover_image_url="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&auto=format&fit=crop&q=80",
+        reading_time_minutes=3,
+        status="PUBLISHED",
+        is_featured=False,
+        is_editors_pick=False,
+        view_count=98,
+        like_count=18,
+        comment_count=0,
+        published_at=now - timedelta(days=6),
+    )
+    db.session.add(post3)
+    db.session.flush()
+
+    # Comments on Article 1
+    c1 = BlogComment(
+        post_id=post1.id,
+        author_id=student_user.id,
+        content="This explanation of cyclic reference counting helped me understand a memory leak we had in our university project! Thank you Alex."
+    )
+    db.session.add(c1)
+    db.session.flush()
+
+    c1_reply = BlogComment(
+        post_id=post1.id,
+        author_id=dev_user.id,
+        parent_id=c1.id,
+        content="Glad it helped Maya! Always look out for circular callbacks in event emitters too."
+    )
+    db.session.add(c1_reply)
+
+    db.session.commit()
+    print("Blogs seeded successfully!")
+
 def seed_database():
     app = create_app("development")
     with app.app_context():
@@ -198,14 +396,20 @@ def seed_database():
 
         if User.query.filter_by(username="admin").first():
             from app.models.event import Event
+            from app.models.blog import BlogPost
+            admin_user = User.query.filter_by(username="admin").first()
+            dev_user = User.query.filter_by(username="developer").first()
+            student_user = User.query.filter_by(username="student").first()
+
             if not Event.query.first():
                 print("Seeding missing events into existing database...")
-                admin_user = User.query.filter_by(username="admin").first()
-                dev_user = User.query.filter_by(username="developer").first()
-                # Run events seeding
                 _seed_events(admin_user, dev_user)
-            else:
-                print("Database already contains seed data and events. Skipping.")
+
+            if not BlogPost.query.first():
+                print("Seeding missing blogs into existing database...")
+                _seed_blogs(admin_user, dev_user, student_user)
+
+            print("Database check complete. Skipping main user seed.")
             return
 
         print("Seeding demo users...")

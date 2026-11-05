@@ -110,3 +110,4 @@ class EventMedia(db.Model):
             "uploader_username": self.uploader.username if self.uploader else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
+

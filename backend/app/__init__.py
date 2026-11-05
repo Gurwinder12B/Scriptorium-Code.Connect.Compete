@@ -30,6 +30,7 @@ def create_app(config_name=None):
     from app.admin.routes import admin_bp
     from app.events.routes import events_bp
     from app.common.upload_routes import uploads_bp
+    from app.blogs.routes import blogs_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(users_bp)
@@ -43,6 +44,7 @@ def create_app(config_name=None):
     app.register_blueprint(admin_bp)
     app.register_blueprint(events_bp)
     app.register_blueprint(uploads_bp)
+    app.register_blueprint(blogs_bp)
 
     # Health check & system discovery endpoints
     @app.route("/health", methods=["GET"])

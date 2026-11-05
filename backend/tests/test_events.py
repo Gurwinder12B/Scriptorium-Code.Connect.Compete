@@ -131,3 +131,4 @@ def test_create_event_authorization(client, app, test_user, test_admin):
     created = resp_admin.get_json()["data"]
     assert created["title"] == "Unauthorized Event"
     assert len(created["albums"]) == 1  # default highlights album created
+

@@ -1,10 +1,12 @@
 from flask import jsonify
 
-def success_response(data=None, meta=None, status_code=200):
+def success_response(data=None, meta=None, message=None, status_code=200):
     payload = {
         "success": True,
         "data": data if data is not None else {}
     }
+    if message:
+        payload["message"] = message
     if meta is not None:
         payload["meta"] = meta
     return jsonify(payload), status_code

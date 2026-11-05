@@ -348,3 +348,4 @@ def reorder_event_media(event_id: int):
 
     db.session.commit()
     return success_response(message="Media order updated.")
+

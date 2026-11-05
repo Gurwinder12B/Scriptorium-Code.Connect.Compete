@@ -77,3 +77,4 @@ def save_uploaded_media(file_storage, subfolder: str = "general", media_type: st
 
     # Return web-accessible URL path
     return f"/uploads/{subfolder}/{final_filename}"
+

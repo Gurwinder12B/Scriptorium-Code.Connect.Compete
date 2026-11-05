@@ -117,3 +117,4 @@ export const MediaLightbox: React.FC<MediaLightboxProps> = ({
     </div>
   );
 };
+

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { usersApi } from '../services/api';
+import { usersApi, blogsApi } from '../services/api';
+import { BlogPostItem } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { Badge } from '../components/common/Badge';
@@ -15,6 +16,9 @@ import {
   Globe,
   Edit2,
   Calendar,
+  BookOpen,
+  Clock,
+  Heart,
 } from 'lucide-react';
 
 export const UserProfilePage: React.FC = () => {
@@ -22,6 +26,7 @@ export const UserProfilePage: React.FC = () => {
   const { user: currentUser } = useAuth();
 
   const [profileData, setProfileData] = useState<any>(null);
+  const [userBlogs, setUserBlogs] = useState<BlogPostItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,8 +45,12 @@ export const UserProfilePage: React.FC = () => {
     async function loadProfile() {
       if (!username) return;
       try {
-        const data = await usersApi.getProfile(username);
+        const [data, blogsRes] = await Promise.all([
+          usersApi.getProfile(username),
+          blogsApi.getBlogs({ author: username, status: 'PUBLISHED' }).catch(() => ({ data: { items: [] } }))
+        ]);
         setProfileData(data);
+        setUserBlogs(blogsRes.data?.items || []);
         const p = data.profile || {};
         setFullName(p.full_name || '');
         setBio(p.bio || '');
@@ -189,6 +198,47 @@ export const UserProfilePage: React.FC = () => {
           <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
             {p.bio || 'This user has not written a biography yet.'}
           </p>
+
+          {/* Published Technical Articles */}
+          {userBlogs && userBlogs.length > 0 && (
+            <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-900 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-500" />
+                  Published Technical Articles ({userBlogs.length})
+                </h3>
+              </div>
+              <div className="space-y-3">
+                {userBlogs.map((b) => (
+                  <Link
+                    key={b.id}
+                    to={`/blogs/${b.slug || b.id}`}
+                    className="block p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition border border-slate-100 dark:border-slate-800/80"
+                  >
+                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+                      <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                        {b.category?.name || 'Technical Article'}
+                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> {b.reading_time_minutes} min
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> {b.like_count}
+                        </span>
+                      </div>
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
+                      {b.title}
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mt-1">
+                      {b.excerpt}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Recent Questions */}
           {profileData.recent_questions && profileData.recent_questions.length > 0 && (

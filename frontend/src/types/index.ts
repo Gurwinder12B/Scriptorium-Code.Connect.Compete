@@ -260,3 +260,81 @@ export interface EventItem {
   media?: EventMediaItem[];
 }
 
+// ----------------------------------------------------------------------------
+// Student Blogs & Editorial Management Types
+// ----------------------------------------------------------------------------
+
+export interface BlogCategory {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  posts_count: number;
+}
+
+export interface BlogTag {
+  id: number;
+  name: string;
+  slug: string;
+  usage_count: number;
+}
+
+export interface BlogCommentItem {
+  id: number;
+  post_id: number;
+  author_id: number;
+  author_username: string;
+  author_avatar?: string;
+  content: string;
+  created_at: string;
+  replies?: BlogCommentItem[];
+}
+
+export interface BlogPostItem {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content_markdown?: string;
+  cover_image_url: string;
+  reading_time_minutes: number;
+  status: 'DRAFT' | 'PENDING_REVIEW' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED';
+  rejection_reason?: string;
+  is_featured: boolean;
+  is_editors_pick: boolean;
+  view_count: number;
+  like_count: number;
+  comment_count: number;
+  scheduled_at?: string;
+  published_at?: string;
+  created_at: string;
+  updated_at?: string;
+  user_has_liked?: boolean;
+  user_has_bookmarked?: boolean;
+  author?: {
+    id: number;
+    username: string;
+    role: string;
+    avatar_url?: string;
+    full_name?: string;
+  };
+  category?: BlogCategory;
+  tags?: BlogTag[];
+  comments?: BlogCommentItem[];
+  related_posts?: BlogPostItem[];
+}
+
+export interface EditorialCalendarGap {
+  start_date: string;
+  end_date?: string;
+  gap_days: number;
+  message: string;
+}
+
+export interface EditorialCalendarData {
+  articles: BlogPostItem[];
+  gaps: EditorialCalendarGap[];
+  target_cadence: string;
+  pending_review_count: number;
+}
+

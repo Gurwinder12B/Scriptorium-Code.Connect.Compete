@@ -6,6 +6,7 @@ from app.models.moderation import Report, ModerationAction
 from app.models.notification import Notification
 from app.models.audit import AuditLog, Bookmark
 from app.models.event import Event, EventAlbum, EventMedia
+from app.models.blog import BlogCategory, BlogTag, BlogPost, BlogComment, BlogLike
 
 __all__ = [
     "User",
@@ -30,5 +31,10 @@ __all__ = [
     "Event",
     "EventAlbum",
     "EventMedia",
+    "BlogCategory",
+    "BlogTag",
+    "BlogPost",
+    "BlogComment",
+    "BlogLike",
 ]
 
