@@ -81,3 +81,31 @@ def test_code_submission_and_progress_tracking(client, test_user, test_admin):
     assert prog_data_2["solved_count"] == 1
     assert prog_data_2["points"] == 10
 
+
+def test_problem_ai_mentor_hints(client, test_admin):
+    admin_headers = auth_headers(test_admin)
+    prob_payload = {
+        "title": "Reverse Linked List",
+        "difficulty": "EASY",
+        "description_markdown": "Reverse a singly linked list.",
+        "input_format": "List nodes",
+        "output_format": "Reversed nodes",
+        "sample_test_cases": [{"input_data": "[1,2,3]", "expected_output": "[3,2,1]"}]
+    }
+    create_res = client.post("/api/v1/problems", json=prob_payload, headers=admin_headers)
+    assert create_res.status_code == 201
+    prob_id = create_res.get_json()["data"]["id"]
+
+    # Fetch hints for the problem
+    hints_res = client.get(f"/api/v1/problems/{prob_id}/hints")
+    assert hints_res.status_code == 200
+    hints_data = hints_res.get_json()["data"]
+    assert isinstance(hints_data, list)
+    assert len(hints_data) == 4
+    assert hints_data[0]["level"] == 1
+    assert "Conceptual Intuition" in hints_data[0]["title"]
+    assert hints_data[3]["level"] == 4
+    assert "Pseudo-code" in hints_data[3]["title"]
+
+
+

@@ -74,6 +74,116 @@ def get_problem(id_or_slug):
 
     return success_response(data=data)
 
+@problems_bp.route("/<id_or_slug>/hints", methods=["GET"])
+@optional_auth
+def get_problem_hints(id_or_slug):
+    problem = None
+    if id_or_slug.isdigit():
+        problem = Problem.query.filter_by(id=int(id_or_slug), is_published=True).first()
+    if not problem:
+        problem = Problem.query.filter_by(slug=id_or_slug, is_published=True).first()
+
+    if not problem:
+        raise NotFoundError("Problem not found.")
+
+    title_lower = problem.title.lower()
+
+    # Generate progressive 4-level hints tailored to algorithmic family
+    if "two sum" in title_lower:
+        hints = [
+            {
+                "level": 1,
+                "title": "Conceptual Intuition",
+                "content": "A brute-force solution checks all pairs in O(N^2) time. Can you trade a small amount of extra memory (O(N)) to lookup required complement values in O(1) time?",
+            },
+            {
+                "level": 2,
+                "title": "Algorithmic Approach Breakdown",
+                "content": "As you iterate through the list with index i and value num, the matching partner you need is (target - num). Check if this complement has already been stored in a hash map.",
+            },
+            {
+                "level": 3,
+                "title": "Edge Case & Invariant Checks",
+                "content": "Be careful not to pair an element with itself! Storing the map mapping value -> index as you iterate forward naturally guarantees you only pair with an earlier element.",
+            },
+            {
+                "level": 4,
+                "title": "Pseudo-code Scaffold",
+                "content": "seen = {}\nfor i, num in enumerate(nums):\n    diff = target - num\n    if diff in seen:\n        return [seen[diff], i]\n    seen[num] = i\nreturn []",
+            },
+        ]
+    elif "palindrome" in title_lower:
+        hints = [
+            {
+                "level": 1,
+                "title": "Conceptual Intuition",
+                "content": "A palindrome reads identical backwards and forwards. Notice negative numbers: does -121 read the same backwards (121-)?",
+            },
+            {
+                "level": 2,
+                "title": "Algorithmic Approach Breakdown",
+                "content": "Negative numbers can never be palindromes due to the leading minus sign. For positive numbers, you can either compare string reversals or reverse the integer mathematically using modulo arithmetic.",
+            },
+            {
+                "level": 3,
+                "title": "Edge Case & Invariant Checks",
+                "content": "Numbers ending in 0 (like 10, 20) cannot be palindromes unless the number itself is 0.",
+            },
+            {
+                "level": 4,
+                "title": "Pseudo-code Scaffold",
+                "content": "if x < 0: return False\ns = str(x)\nreturn s == s[::-1]",
+            },
+        ]
+    elif "parentheses" in title_lower:
+        hints = [
+            {
+                "level": 1,
+                "title": "Conceptual Intuition",
+                "content": "Every time you encounter a closing bracket, it must match the most recently opened opening bracket. What Last-In-First-Out (LIFO) data structure models this?",
+            },
+            {
+                "level": 2,
+                "title": "Algorithmic Approach Breakdown",
+                "content": "Use a Stack. Push opening brackets '(', '{', '[' onto the stack. When a closing bracket is seen, pop from the stack and verify that the types match.",
+            },
+            {
+                "level": 3,
+                "title": "Edge Case & Invariant Checks",
+                "content": "What happens if a closing bracket appears and the stack is empty? (Invalid). What if all characters are processed and the stack is not empty? (Invalid).",
+            },
+            {
+                "level": 4,
+                "title": "Pseudo-code Scaffold",
+                "content": "stack = []\nmatching = {')': '(', '}': '{', ']': '['}\nfor ch in s:\n    if ch in matching.values():\n        stack.append(ch)\n    elif ch in matching:\n        if not stack or stack.pop() != matching[ch]:\n            return False\nreturn len(stack) == 0",
+            },
+        ]
+    else:
+        hints = [
+            {
+                "level": 1,
+                "title": "Conceptual Intuition",
+                "content": f"Analyze the constraints and time complexity target for {problem.difficulty} problem: {problem.constraints or 'N <= 10^5'}. Look for invariants in the input structure.",
+            },
+            {
+                "level": 2,
+                "title": "Algorithmic Approach Breakdown",
+                "content": "Consider whether sorting, a two-pointer sliding window, or dynamic programming memoization can eliminate redundant subproblem recalculations.",
+            },
+            {
+                "level": 3,
+                "title": "Edge Case & Invariant Checks",
+                "content": "Test your logic against: empty inputs, single element lists, duplicate values, and minimum/maximum numeric overflow boundaries.",
+            },
+            {
+                "level": 4,
+                "title": "Pseudo-code Scaffold",
+                "content": "# Initialize result accumulator / tracking state\nstate = initialize_state()\nfor element in input_stream:\n    state.update(element)\nreturn state.finalize()",
+            },
+        ]
+
+    return success_response(data=hints)
+
 @problems_bp.route("", methods=["POST"])
 @require_role("admin", "moderator")
 def create_problem():

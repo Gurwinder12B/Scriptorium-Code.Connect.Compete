@@ -20,6 +20,8 @@ import {
   CalendarDays,
   FolderGit2,
   Users,
+  Activity,
+  Compass,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -125,6 +127,28 @@ export const Navbar: React.FC = () => {
               >
                 <Users className="w-4 h-4 mr-2" />
                 Clubs
+              </Link>
+              <Link
+                to="/visualizer"
+                className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                  isActive('/visualizer')
+                    ? 'bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <Activity className="w-4 h-4 mr-2" />
+                Visualizer
+              </Link>
+              <Link
+                to="/learning"
+                className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                  isActive('/learning')
+                    ? 'bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <Compass className="w-4 h-4 mr-2" />
+                Roadmaps
               </Link>
               <Link
                 to="/leaderboard"
@@ -338,6 +362,22 @@ export const Navbar: React.FC = () => {
           >
             <Users className="w-5 h-5 mr-3 text-slate-400" />
             Clubs
+          </Link>
+          <Link
+            to="/visualizer"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <Activity className="w-5 h-5 mr-3 text-slate-400" />
+            Visualizer
+          </Link>
+          <Link
+            to="/learning"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <Compass className="w-5 h-5 mr-3 text-slate-400" />
+            Roadmaps
           </Link>
           <Link
             to="/leaderboard"

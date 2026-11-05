@@ -35,8 +35,13 @@ export const ProblemDetailPage: React.FC = () => {
   // Submission State
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [latestSubmission, setLatestSubmission] = useState<Submission | null>(null);
-  const [activeTab, setActiveTab] = useState<'statement' | 'submissions'>('statement');
+  const [activeTab, setActiveTab] = useState<'statement' | 'submissions' | 'hints'>('statement');
   const [userSubmissions, setUserSubmissions] = useState<Submission[]>([]);
+
+  // AI Mentor & Hints State
+  const [hints, setHints] = useState<any[]>([]);
+  const [unlockedLevel, setUnlockedLevel] = useState(1);
+  const [loadingHints, setLoadingHints] = useState(false);
 
   useEffect(() => {
     async function loadProblem() {
@@ -112,6 +117,19 @@ export const ProblemDetailPage: React.FC = () => {
       setUserSubmissions(history);
     } catch (e) {
       console.error('Failed to load submission history:', e);
+    }
+  };
+
+  const loadHints = async () => {
+    if (!problem) return;
+    setLoadingHints(true);
+    try {
+      const data = await problemsApi.getHints(problem.id);
+      setHints(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error('Failed to load hints:', e);
+    } finally {
+      setLoadingHints(false);
     }
   };
 
@@ -223,6 +241,20 @@ export const ProblemDetailPage: React.FC = () => {
             >
               My Submissions
             </button>
+            <button
+              onClick={() => {
+                setActiveTab('hints');
+                if (hints.length === 0) loadHints();
+              }}
+              className={`px-4 py-2 text-xs font-bold border-b-2 transition flex items-center gap-1.5 ${
+                activeTab === 'hints'
+                  ? 'border-brand-600 text-brand-600 dark:text-brand-400'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>AI Mentor & Hints</span>
+            </button>
           </div>
 
           {/* Left Pane Content Area */}
@@ -286,7 +318,7 @@ export const ProblemDetailPage: React.FC = () => {
                   </div>
                 )}
               </>
-            ) : (
+            ) : activeTab === 'submissions' ? (
               /* Submissions History */
               <div className="space-y-3">
                 {userSubmissions.length === 0 ? (
@@ -319,6 +351,89 @@ export const ProblemDetailPage: React.FC = () => {
                       </div>
                     </div>
                   ))
+                )}
+              </div>
+            ) : (
+              /* AI Mentor & Hints Tab */
+              <div className="space-y-6">
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-300 text-xs leading-relaxed space-y-1">
+                  <div className="font-bold flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <span>Scriptorium AI Mentor: Socratic Learning</span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-300">
+                    Stuck? Hints are structured progressively. Try solving the problem after each hint without revealing the entire scaffold!
+                  </p>
+                </div>
+
+                {loadingHints ? (
+                  <div className="py-12 flex justify-center">
+                    <LoadingSpinner size="md" text="Consulting AI Mentor..." />
+                  </div>
+                ) : hints.length === 0 ? (
+                  <p className="text-xs text-slate-500 dark:text-slate-400 text-center py-8">
+                    No hints currently available for this problem.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {hints.map((hint, idx) => {
+                      const isUnlocked = hint.level <= unlockedLevel;
+                      return (
+                        <div
+                          key={hint.level || idx}
+                          className={`p-5 rounded-2xl border transition ${
+                            isUnlocked
+                              ? 'bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 shadow-xs'
+                              : 'bg-slate-100/50 dark:bg-slate-900/40 border-dashed border-slate-200 dark:border-slate-800 opacity-60'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
+                              hint.level === 1
+                                ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-400'
+                                : hint.level === 2
+                                ? 'bg-sky-100 text-sky-800 dark:bg-sky-950/80 dark:text-sky-400'
+                                : hint.level === 3
+                                ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-400'
+                                : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-400'
+                            }`}>
+                              Level {hint.level}: {hint.title}
+                            </span>
+                            <span className="text-[11px] font-semibold text-slate-400">
+                              {isUnlocked ? 'Unlocked' : 'Locked'}
+                            </span>
+                          </div>
+
+                          {isUnlocked ? (
+                            <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed font-sans">
+                              {hint.level === 4 ? (
+                                <pre className="p-3 rounded-xl bg-slate-900 text-slate-100 font-mono text-xs overflow-x-auto mt-2">
+                                  <code>{hint.content}</code>
+                                </pre>
+                              ) : (
+                                hint.content
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-slate-400 italic">
+                              Solve the prior step or unlock below to view this hint.
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    {unlockedLevel < hints.length && (
+                      <div className="pt-2 text-center">
+                        <button
+                          onClick={() => setUnlockedLevel(prev => prev + 1)}
+                          className="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition"
+                        >
+                          Reveal Hint Level {unlockedLevel + 1} →
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             )}

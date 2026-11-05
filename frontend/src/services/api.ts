@@ -134,6 +134,7 @@ export const problemsApi = {
     return request<any[]>(`/problems?${query.toString()}`);
   },
   getProblem: (idOrSlug: string | number) => request<any>(`/problems/${idOrSlug}`),
+  getHints: (idOrSlug: string | number) => request<any[]>(`/problems/${idOrSlug}/hints`),
   createProblem: (data: any) =>
     request<any>('/problems', {
       method: 'POST',
