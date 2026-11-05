@@ -2,6 +2,10 @@
 
 **SCRIPTORIUM** is an enterprise-grade developer ecosystem designed for students, competitive programmers, and technical software engineers. It harmoniously unifies programming practice, developer discussions, student engineering blogs, peer code reviews, campus technical clubs, event memories, and interactive learning tools into a single, cohesive dark-themed platform.
 
+![SCRIPTORIUM Platform Overview](screenshots/01_landing_and_auth/01_homepage_hero.png)
+
+> 📸 **Visual Showcase:** A complete, organized gallery of 23 high-resolution screenshots capturing every module and workflow is available in [`screenshots/README.md`](screenshots/README.md).
+
 ---
 
 ## 🌟 Platform Highlights & Modules
