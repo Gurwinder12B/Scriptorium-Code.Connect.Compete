@@ -17,9 +17,12 @@ export class ApiError extends Error {
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('scriptorium_token');
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   };
+
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -193,5 +196,68 @@ export const adminApi = {
       body: JSON.stringify({ role, is_active }),
     }),
   getAuditLogs: () => request<any[]>('/admin/audit-logs'),
+};
+
+export const uploadApi = {
+  uploadFile: (file: File, subfolder = 'general', mediaType = 'image') => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('subfolder', subfolder);
+    formData.append('media_type', mediaType);
+    return request<{ url: string; filename: string }>('/uploads', {
+      method: 'POST',
+      body: formData,
+    });
+  },
+};
+
+export const eventsApi = {
+  getEvents: (params: { category?: string; year?: number | string; club?: string; q?: string; page?: number; per_page?: number; archived?: boolean } = {}) => {
+    const searchParams = new URLSearchParams();
+    if (params.category) searchParams.set('category', params.category);
+    if (params.year) searchParams.set('year', String(params.year));
+    if (params.club) searchParams.set('club', params.club);
+    if (params.q) searchParams.set('q', params.q);
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.per_page) searchParams.set('per_page', String(params.per_page));
+    if (params.archived) searchParams.set('archived', 'true');
+    return request<any>(`/events?${searchParams.toString()}`);
+  },
+  getEvent: (identifier: string | number) => request<any>(`/events/${identifier}`),
+  createEvent: (data: any) =>
+    request<any>('/events', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateEvent: (id: number, data: any) =>
+    request<any>(`/events/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  deleteEvent: (id: number) =>
+    request<any>(`/events/${id}`, {
+      method: 'DELETE',
+    }),
+  createAlbum: (eventId: number, data: { title: string; description?: string }) =>
+    request<any>(`/events/${eventId}/albums`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  uploadMedia: (eventId: number, mediaData: FormData | Record<string, any>) => {
+    const isFormData = mediaData instanceof FormData;
+    return request<any>(`/events/${eventId}/media`, {
+      method: 'POST',
+      body: isFormData ? mediaData : JSON.stringify(mediaData),
+    });
+  },
+  deleteMedia: (eventId: number, mediaId: number) =>
+    request<any>(`/events/${eventId}/media/${mediaId}`, {
+      method: 'DELETE',
+    }),
+  reorderMedia: (eventId: number, mediaIds: number[]) =>
+    request<any>(`/events/${eventId}/media/reorder`, {
+      method: 'POST',
+      body: JSON.stringify({ media_ids: mediaIds }),
+    }),
 };
 

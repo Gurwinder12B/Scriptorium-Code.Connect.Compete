@@ -5,6 +5,7 @@ from app.models.submission import Submission, SubmissionResult, UserProblemProgr
 from app.models.moderation import Report, ModerationAction
 from app.models.notification import Notification
 from app.models.audit import AuditLog, Bookmark
+from app.models.event import Event, EventAlbum, EventMedia
 
 __all__ = [
     "User",
@@ -26,5 +27,8 @@ __all__ = [
     "Notification",
     "AuditLog",
     "Bookmark",
+    "Event",
+    "EventAlbum",
+    "EventMedia",
 ]
 

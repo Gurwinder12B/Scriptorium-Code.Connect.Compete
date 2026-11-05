@@ -15,6 +15,7 @@ import {
   X,
   Sun,
   Moon,
+  Camera,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -76,6 +77,17 @@ export const Navbar: React.FC = () => {
               >
                 <Code2 className="w-4 h-4 mr-2" />
                 Problems
+              </Link>
+              <Link
+                to="/events"
+                className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                  isActive('/events')
+                    ? 'bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <Camera className="w-4 h-4 mr-2" />
+                Event Media
               </Link>
               <Link
                 to="/leaderboard"
@@ -246,6 +258,14 @@ export const Navbar: React.FC = () => {
           >
             <Code2 className="w-5 h-5 mr-3 text-slate-400" />
             Problems
+          </Link>
+          <Link
+            to="/events"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <Camera className="w-5 h-5 mr-3 text-slate-400" />
+            Event Media
           </Link>
           <Link
             to="/leaderboard"

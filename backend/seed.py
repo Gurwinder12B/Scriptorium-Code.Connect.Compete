@@ -6,6 +6,190 @@ from app.models.community import Tag, Question, Answer, Comment, Vote
 from app.models.problem import Problem, TestCase
 from app.common.security import hash_password
 
+def _seed_events(admin_user, dev_user):
+    from app.models.event import Event, EventAlbum, EventMedia
+    from datetime import datetime, timezone
+
+    print("Seeding university events & media memories...")
+    ev1 = Event(
+        title="Scriptorium Annual Hackathon 2026",
+        slug="scriptorium-annual-hackathon-2026",
+        description="A high-intensity 48-hour continuous coding hackathon where 60 student developer teams built cutting-edge AI tools, developer utilities, and web services. Features live judging and hardware showcases.",
+        category="Hackathons",
+        event_date=datetime(2026, 3, 14, 9, 0, 0, tzinfo=timezone.utc),
+        location="University Tech Innovation Hub, Hall A",
+        organizing_club="Scriptorium Core & ACM Student Chapter",
+        cover_image_url="https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=1200&auto=format&fit=crop&q=80",
+        recap_markdown="""# Scriptorium Annual Hackathon 2026 Recap
+
+The university's flagship hackathon brought together over **240 students across 60 teams**. 
+Participants hacked throughout the weekend on:
+- Automated code refactoring agents
+- Decentralized identity credentials for students
+- Real-time collaborative audio & code synthesizers
+
+### Winning Highlights
+- **1st Place:** Team *ByteCraft* for their real-time AST visualizer.
+- **2nd Place:** Team *NeuralPulse* for their latency-optimized edge LLM runner.
+- **Best First-Year Project:** Team *AlgoRookies* for their automated problem solver.""",
+        highlights=[
+            "60 Teams Participated",
+            "48 Hours of Non-stop Coding",
+            "$5,000 in Prizes & Swag",
+            "15 Industry Judges & Mentors"
+        ],
+        participating_teams=[
+            {"name": "Team ByteCraft", "project": "AST Visualizer", "rank": "1st Place"},
+            {"name": "Team NeuralPulse", "project": "Edge LLM Runner", "rank": "2nd Place"},
+            {"name": "Team AlgoRookies", "project": "Graph Walkthroughs", "rank": "Best First-Year"}
+        ],
+        is_published=True,
+        created_by_id=admin_user.id,
+    )
+    db.session.add(ev1)
+    db.session.flush()
+
+    album1_1 = EventAlbum(event_id=ev1.id, title="Opening Ceremony & Team Pitches", description="Kickoff, keynote speeches, and team ideation.")
+    album1_2 = EventAlbum(event_id=ev1.id, title="Midnight Hacking & Mentorship", description="Late-night debugging sessions, pizza rounds, and mentor feedback.")
+    album1_3 = EventAlbum(event_id=ev1.id, title="Award Ceremony & Winner Demos", description="Final pitches on stage and trophy presentations.")
+    db.session.add_all([album1_1, album1_2, album1_3])
+    db.session.flush()
+
+    media_items_ev1 = [
+        EventMedia(
+            event_id=ev1.id,
+            album_id=album1_1.id,
+            media_type="image",
+            media_url="https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=1200&auto=format&fit=crop&q=80",
+            thumbnail_url="https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600&auto=format&fit=crop&q=80",
+            caption="Teams assembled in the Main Innovation Hall for the Hackathon Kickoff",
+            photographer_credit="Campus Media Bureau",
+            display_order=1,
+            uploaded_by_id=admin_user.id,
+        ),
+        EventMedia(
+            event_id=ev1.id,
+            album_id=album1_2.id,
+            media_type="image",
+            media_url="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&auto=format&fit=crop&q=80",
+            thumbnail_url="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&auto=format&fit=crop&q=80",
+            caption="Mentor Alex Chen reviewing system architecture with Team ByteCraft at 2 AM",
+            photographer_credit="Alex Chen",
+            display_order=2,
+            uploaded_by_id=dev_user.id,
+        ),
+        EventMedia(
+            event_id=ev1.id,
+            album_id=album1_3.id,
+            media_type="image",
+            media_url="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&auto=format&fit=crop&q=80",
+            thumbnail_url="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&auto=format&fit=crop&q=80",
+            caption="Team ByteCraft receiving the 1st Place Trophy and Certificate",
+            photographer_credit="Campus News",
+            display_order=3,
+            uploaded_by_id=admin_user.id,
+        ),
+        EventMedia(
+            event_id=ev1.id,
+            album_id=album1_1.id,
+            media_type="image",
+            media_url="https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=1200&auto=format&fit=crop&q=80",
+            thumbnail_url="https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=600&auto=format&fit=crop&q=80",
+            caption="Keynote address: Future of Agentic Software Engineering",
+            photographer_credit="Campus News",
+            display_order=4,
+            uploaded_by_id=admin_user.id,
+        ),
+    ]
+    db.session.add_all(media_items_ev1)
+
+    # Event 2: ACM ICPC Collegiate Warmup
+    ev2 = Event(
+        title="ACM ICPC Regional Collegiate Warmup 2026",
+        slug="acm-icpc-regional-collegiate-warmup-2026",
+        description="Competitive programming tournament simulating regional ICPC conditions with 8 algorithmic problems, strict memory/time bounds, and live scoreboard freeze.",
+        category="Competitions",
+        event_date=datetime(2026, 4, 18, 14, 0, 0, tzinfo=timezone.utc),
+        location="Computer Systems Lab 3 & 4",
+        organizing_club="Competitive Programming Guild",
+        cover_image_url="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&auto=format&fit=crop&q=80",
+        recap_markdown="""# ACM ICPC Regional Warmup 2026
+
+35 collegiate teams solved 8 algorithmic challenges over 5 intense hours.
+Problems ranged from dynamic programming with bitmasks to segment trees and max flow.""",
+        highlights=[
+            "35 Competing Teams",
+            "8 Challenging Algorithmic Problems",
+            "Real-time Balloon Tracking",
+            "First Solve on Problem D in 18 minutes"
+        ],
+        is_published=True,
+        created_by_id=admin_user.id,
+    )
+    db.session.add(ev2)
+    db.session.flush()
+
+    album2_1 = EventAlbum(event_id=ev2.id, title="Contest Arena & Live Scoreboard", description="Intense problem solving and balloon allocations.")
+    db.session.add(album2_1)
+    db.session.flush()
+
+    ev2_media = [
+        EventMedia(
+            event_id=ev2.id,
+            album_id=album2_1.id,
+            media_type="image",
+            media_url="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&auto=format&fit=crop&q=80",
+            thumbnail_url="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&auto=format&fit=crop&q=80",
+            caption="Teams focused during the final hour before scoreboard freeze",
+            photographer_credit="ACM Guild",
+            display_order=1,
+            uploaded_by_id=admin_user.id,
+        )
+    ]
+    db.session.add_all(ev2_media)
+
+    # Event 3: Full-Stack Web Development Workshop
+    ev3 = Event(
+        title="Modern Full-Stack Web Development Bootcamp",
+        slug="modern-fullstack-web-development-bootcamp",
+        description="Comprehensive hands-on workshop guiding students through React, TypeScript, Tailwind CSS, Python Flask REST APIs, and Docker containerization.",
+        category="Workshops",
+        event_date=datetime(2026, 5, 2, 10, 0, 0, tzinfo=timezone.utc),
+        location="Auditorium B & Virtual Livestream",
+        organizing_club="Web & Cloud Developers Club",
+        cover_image_url="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&auto=format&fit=crop&q=80",
+        highlights=[
+            "120 Attendees",
+            "Built & Deployed Full-Stack App",
+            "Zero-to-Hero Cloud Architecture"
+        ],
+        is_published=True,
+        created_by_id=dev_user.id,
+    )
+    db.session.add(ev3)
+    db.session.flush()
+
+    album3_1 = EventAlbum(event_id=ev3.id, title="Live Coding & Architecture Walkthrough", description="Live coding sessions and interactive Q&A.")
+    db.session.add(album3_1)
+    db.session.flush()
+
+    ev3_media = [
+        EventMedia(
+            event_id=ev3.id,
+            album_id=album3_1.id,
+            media_type="image",
+            media_url="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&auto=format&fit=crop&q=80",
+            thumbnail_url="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&auto=format&fit=crop&q=80",
+            caption="Hands-on demonstration of REST API architecture and database indexing",
+            photographer_credit="Web Club",
+            display_order=1,
+            uploaded_by_id=dev_user.id,
+        )
+    ]
+    db.session.add_all(ev3_media)
+    db.session.commit()
+    print("Events seeded successfully!")
+
 def seed_database():
     app = create_app("development")
     with app.app_context():
@@ -13,7 +197,15 @@ def seed_database():
         db.create_all()
 
         if User.query.filter_by(username="admin").first():
-            print("Database already contains seed data. Skipping.")
+            from app.models.event import Event
+            if not Event.query.first():
+                print("Seeding missing events into existing database...")
+                admin_user = User.query.filter_by(username="admin").first()
+                dev_user = User.query.filter_by(username="developer").first()
+                # Run events seeding
+                _seed_events(admin_user, dev_user)
+            else:
+                print("Database already contains seed data and events. Skipping.")
             return
 
         print("Seeding demo users...")
@@ -274,9 +466,10 @@ Each process gets its own independent Python interpreter and memory space, effec
             content="Great question! Also check out the upcoming free-threaded Python (PEP 703) if you're experimenting with Python 3.13+."
         )
         db.session.add(c1)
-
         db.session.commit()
-        print("Database seeded successfully with demo users, tags, problems, test cases, and discussions!")
+
+        _seed_events(created_users["admin"], created_users["developer"])
+        print("Database seeded successfully with demo users, tags, problems, test cases, and events!")
 
 if __name__ == "__main__":
     seed_database()

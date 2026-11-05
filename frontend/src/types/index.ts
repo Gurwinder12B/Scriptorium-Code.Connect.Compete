@@ -1,4 +1,12 @@
-export type UserRole = 'guest' | 'user' | 'moderator' | 'admin';
+export type UserRole =
+  | 'guest'
+  | 'user'
+  | 'student'
+  | 'author'
+  | 'editor'
+  | 'club_coordinator'
+  | 'moderator'
+  | 'admin';
 
 export interface Profile {
   id: number;
@@ -200,5 +208,55 @@ export interface SystemStats {
   answers_count: number;
   submissions_count: number;
   pending_reports_count: number;
+}
+
+// ----------------------------------------------------------------------------
+// Event Media & Memories Types
+// ----------------------------------------------------------------------------
+
+export interface EventMediaItem {
+  id: number;
+  event_id: number;
+  album_id?: number | null;
+  media_type: 'image' | 'video' | 'external_video';
+  media_url: string;
+  thumbnail_url?: string;
+  caption?: string;
+  photographer_credit?: string;
+  display_order: number;
+  uploader_username?: string;
+  created_at: string;
+}
+
+export interface EventAlbum {
+  id: number;
+  event_id: number;
+  title: string;
+  description?: string;
+  media_count: number;
+  created_at: string;
+}
+
+export interface EventItem {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  category: string;
+  event_date: string;
+  year?: number;
+  month?: string;
+  location: string;
+  organizing_club: string;
+  cover_image_url: string;
+  media_count: number;
+  is_published: boolean;
+  is_archived: boolean;
+  created_at: string;
+  recap_markdown?: string;
+  highlights?: string[];
+  participating_teams?: Array<{ name: string; project?: string; rank?: string }>;
+  albums?: EventAlbum[];
+  media?: EventMediaItem[];
 }
 

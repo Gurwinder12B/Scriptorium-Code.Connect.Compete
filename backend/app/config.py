@@ -13,6 +13,12 @@ class Config:
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///scriptorium.db")
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Media & Uploads
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB max upload
+    ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+    ALLOWED_VIDEO_EXTENSIONS = {"mp4", "webm"}
     
     # Judge Provider: 'mock' (default for dev/offline testing) or 'judge0'
     JUDGE_PROVIDER = os.getenv("JUDGE_PROVIDER", "mock")

@@ -20,6 +20,15 @@ class User(db.Model):
     submissions = db.relationship("Submission", back_populates="user", cascade="all, delete-orphan")
     progress_records = db.relationship("UserProblemProgress", back_populates="user", cascade="all, delete-orphan")
 
+    def can_manage_events(self):
+        return self.role in ("admin", "moderator", "club_coordinator")
+
+    def can_manage_blogs(self):
+        return self.role in ("admin", "moderator", "editor")
+
+    def is_privileged(self):
+        return self.role in ("admin", "moderator")
+
     def to_dict(self):
         return {
             "id": self.id,

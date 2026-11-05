@@ -20,6 +20,8 @@ import { UserProfilePage } from './pages/UserProfilePage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
+import { EventGalleryPage } from './pages/EventGalleryPage';
+import { EventDetailPage } from './pages/EventDetailPage';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode; requiredRole?: string[] }> = ({
@@ -71,6 +73,8 @@ export const App: React.FC = () => {
                 <Route path="/community/questions/:id" element={<QuestionDetailPage />} />
                 <Route path="/problems" element={<ProblemLibraryPage />} />
                 <Route path="/problems/:id" element={<ProblemDetailPage />} />
+                <Route path="/events" element={<EventGalleryPage />} />
+                <Route path="/events/:id" element={<EventDetailPage />} />
                 <Route path="/profile/:username" element={<UserProfilePage />} />
                 <Route path="/leaderboard" element={<LeaderboardPage />} />
 

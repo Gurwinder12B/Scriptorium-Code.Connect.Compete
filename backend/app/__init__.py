@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, send_from_directory
 from app.config import config_by_name
 from app.extensions import db, migrate, cors
 from app.common.responses import error_response, success_response
@@ -28,6 +28,8 @@ def create_app(config_name=None):
     from app.moderation.routes import moderation_bp
     from app.notifications.routes import notifications_bp
     from app.admin.routes import admin_bp
+    from app.events.routes import events_bp
+    from app.common.upload_routes import uploads_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(users_bp)
@@ -39,11 +41,19 @@ def create_app(config_name=None):
     app.register_blueprint(moderation_bp)
     app.register_blueprint(notifications_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(events_bp)
+    app.register_blueprint(uploads_bp)
 
     # Health check & system discovery endpoints
     @app.route("/health", methods=["GET"])
     def health():
         return success_response(data={"status": "healthy", "service": "Scriptorium API", "version": "1.0.0"})
+
+    # Static uploads handler
+    @app.route("/uploads/<path:filename>", methods=["GET"])
+    def serve_upload(filename):
+        upload_folder = app.config.get("UPLOAD_FOLDER", os.path.join(os.getcwd(), "uploads"))
+        return send_from_directory(upload_folder, filename)
 
     @app.route("/api/v1", methods=["GET"])
     def api_index():
