@@ -329,3 +329,85 @@ export const blogsApi = {
     }),
 };
 
+export const projectsApi = {
+  getProjects: (params: {
+    category?: string;
+    tag?: string;
+    author?: string;
+    q?: string;
+    sort?: string;
+    page?: number;
+    per_page?: number;
+  } = {}) => {
+    const searchParams = new URLSearchParams();
+    if (params.category) searchParams.set('category', params.category);
+    if (params.tag) searchParams.set('tag', params.tag);
+    if (params.author) searchParams.set('author', params.author);
+    if (params.q) searchParams.set('q', params.q);
+    if (params.sort) searchParams.set('sort', params.sort);
+    if (params.page) searchParams.set('page', String(params.page));
+    if (params.per_page) searchParams.set('per_page', String(params.per_page));
+    return request<any>(`/projects?${searchParams.toString()}`);
+  },
+  getProject: (idOrSlug: string | number) => request<any>(`/projects/${idOrSlug}`),
+  createProject: (data: any) =>
+    request<any>('/projects', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateProject: (id: number, data: any) =>
+    request<any>(`/projects/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  deleteProject: (id: number) =>
+    request<any>(`/projects/${id}`, {
+      method: 'DELETE',
+    }),
+  toggleUpvote: (id: number) =>
+    request<{ upvote_count: number; user_has_upvoted: boolean }>(`/projects/${id}/upvote`, {
+      method: 'POST',
+    }),
+  submitReview: (
+    id: number,
+    data: {
+      summary: string;
+      architecture_feedback?: string;
+      performance_feedback?: string;
+      security_feedback?: string;
+      ui_ux_feedback?: string;
+      rating_overall: number;
+    }
+  ) =>
+    request<any>(`/projects/${id}/reviews`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  updateReviewStatus: (projectId: number, reviewId: number, status: 'OPEN' | 'ADDRESSED' | 'RESOLVED') =>
+    request<any>(`/projects/${projectId}/reviews/${reviewId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    }),
+  upvoteReview: (projectId: number, reviewId: number) =>
+    request<{ upvote_count: number; user_has_upvoted: boolean }>(
+      `/projects/${projectId}/reviews/${reviewId}/upvote`,
+      {
+        method: 'POST',
+      }
+    ),
+  addReviewComment: (
+    projectId: number,
+    reviewId: number,
+    data: { content: string; code_snippet?: string }
+  ) =>
+    request<any>(`/projects/${projectId}/reviews/${reviewId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  addMedia: (projectId: number, data: { media_url: string; caption?: string; display_order?: number }) =>
+    request<any>(`/projects/${projectId}/media`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+

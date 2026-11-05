@@ -338,3 +338,93 @@ export interface EditorialCalendarData {
   pending_review_count: number;
 }
 
+export interface ProjectTagItem {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface ProjectMediaItem {
+  id: number;
+  project_id: number;
+  media_url: string;
+  caption?: string;
+  display_order: number;
+  created_at: string;
+}
+
+export interface ProjectCollaboratorItem {
+  id: number;
+  user_id: number;
+  username: string;
+  role_description: string;
+  avatar_url?: string;
+}
+
+export interface CodeReviewCommentItem {
+  id: number;
+  review_id: number;
+  content: string;
+  code_snippet?: string;
+  created_at: string;
+  author?: {
+    id: number;
+    username: string;
+    role: string;
+    avatar_url?: string;
+  };
+}
+
+export interface CodeReviewItem {
+  id: number;
+  project_id: number;
+  reviewer?: {
+    id: number;
+    username: string;
+    role: string;
+    avatar_url?: string;
+  };
+  summary: string;
+  architecture_feedback?: string;
+  performance_feedback?: string;
+  security_feedback?: string;
+  ui_ux_feedback?: string;
+  rating_overall: number;
+  status: 'OPEN' | 'ADDRESSED' | 'RESOLVED';
+  upvote_count: number;
+  user_has_upvoted?: boolean;
+  created_at: string;
+  updated_at?: string;
+  comments?: CodeReviewCommentItem[];
+}
+
+export interface ProjectItem {
+  id: number;
+  title: string;
+  slug: string;
+  tagline: string;
+  description_markdown?: string;
+  category: string;
+  cover_image_url?: string;
+  github_url?: string;
+  live_demo_url?: string;
+  status: string;
+  view_count: number;
+  upvote_count: number;
+  review_count: number;
+  created_at: string;
+  updated_at?: string;
+  user_has_upvoted?: boolean;
+  author?: {
+    id: number;
+    username: string;
+    role: string;
+    avatar_url?: string;
+    full_name?: string;
+  };
+  tags?: ProjectTagItem[];
+  media?: ProjectMediaItem[];
+  collaborators?: ProjectCollaboratorItem[];
+  reviews?: CodeReviewItem[];
+}
+

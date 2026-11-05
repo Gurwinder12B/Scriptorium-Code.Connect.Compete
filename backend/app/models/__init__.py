@@ -7,6 +7,17 @@ from app.models.notification import Notification
 from app.models.audit import AuditLog, Bookmark
 from app.models.event import Event, EventAlbum, EventMedia
 from app.models.blog import BlogCategory, BlogTag, BlogPost, BlogComment, BlogLike
+from app.models.project import (
+    Project,
+    ProjectMedia,
+    ProjectTag,
+    ProjectCollaborator,
+    CodeReview,
+    CodeReviewComment,
+    ProjectUpvote,
+    ReviewUpvote,
+    project_tags_table,
+)
 
 __all__ = [
     "User",
@@ -36,5 +47,14 @@ __all__ = [
     "BlogPost",
     "BlogComment",
     "BlogLike",
+    "Project",
+    "ProjectMedia",
+    "ProjectTag",
+    "ProjectCollaborator",
+    "CodeReview",
+    "CodeReviewComment",
+    "ProjectUpvote",
+    "ReviewUpvote",
+    "project_tags_table",
 ]
 

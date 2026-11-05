@@ -26,6 +26,8 @@ import { BlogDiscoveryPage } from './pages/BlogDiscoveryPage';
 import { BlogDetailPage } from './pages/BlogDetailPage';
 import { BlogEditorPage } from './pages/BlogEditorPage';
 import { EditorialCalendarPage } from './pages/EditorialCalendarPage';
+import { ProjectShowcasePage } from './pages/ProjectShowcasePage';
+import { ProjectDetailPage } from './pages/ProjectDetailPage';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode; requiredRole?: string[] }> = ({
@@ -81,6 +83,8 @@ export const App: React.FC = () => {
                 <Route path="/events/:id" element={<EventDetailPage />} />
                 <Route path="/blogs" element={<BlogDiscoveryPage />} />
                 <Route path="/blogs/:id" element={<BlogDetailPage />} />
+                <Route path="/projects" element={<ProjectShowcasePage />} />
+                <Route path="/projects/:id" element={<ProjectDetailPage />} />
                 <Route path="/profile/:username" element={<UserProfilePage />} />
                 <Route path="/leaderboard" element={<LeaderboardPage />} />
 
