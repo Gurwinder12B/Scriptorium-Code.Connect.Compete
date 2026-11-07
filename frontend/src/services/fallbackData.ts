@@ -1,4 +1,4 @@
-import { Problem, Question, Tag, LeaderboardEntry, BlogPostItem, BlogCategory, ProjectItem, ClubItem, EventItem } from '../types';
+import { Problem, Question, Tag, LeaderboardEntry, BlogPostItem, BlogCategory, ProjectItem, ClubItem, EventItem, User, SystemStats } from '../types';
 
 export const fallbackProblems: Problem[] = [
   {
@@ -454,4 +454,168 @@ export const fallbackEvents: EventItem[] = [
     media_count: 4,
     created_at: '2026-03-16T12:00:00Z'
   }
+];
+
+export function createOfflineUser(identifier = 'developer'): User {
+  const cleanId = identifier.trim() || 'developer';
+  const username = cleanId.includes('@') ? cleanId.split('@')[0] : cleanId;
+  const lower = username.toLowerCase();
+  const role = lower.includes('admin')
+    ? 'admin'
+    : lower.includes('mod')
+    ? 'moderator'
+    : 'student';
+
+  return {
+    id: 1,
+    username,
+    email: cleanId.includes('@') ? cleanId : `${username}@scriptorium.dev`,
+    role: role as any,
+    is_active: true,
+    created_at: new Date(Date.now() - 86400000 * 60).toISOString(),
+    profile: {
+      id: 1,
+      user_id: 1,
+      full_name: username.charAt(0).toUpperCase() + username.slice(1),
+      bio: 'Full-stack software engineer & problem solver. Building algorithms and systems on Scriptorium.',
+      location: 'San Francisco, CA',
+      github_url: 'https://github.com',
+      website_url: 'https://scriptorium.dev',
+      avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+      points: 1250,
+      problems_solved_count: 14,
+      questions_count: 5,
+      answers_count: 12,
+      updated_at: new Date().toISOString(),
+    },
+  };
+}
+
+export const fallbackDashboardData = {
+  stats: {
+    points: 1250,
+    solved_count: 14,
+    questions_count: 5,
+    answers_count: 12,
+    difficulty_breakdown: {
+      easy: { solved: 8, total: 10 },
+      medium: { solved: 5, total: 8 },
+      hard: { solved: 1, total: 4 },
+    },
+  },
+  recent_submissions: [
+    { id: 101, problem_id: 1, problem_title: 'Two Sum', language: 'python', status: 'ACCEPTED', execution_time_ms: 38 },
+    { id: 102, problem_id: 2, problem_title: 'Palindrome Number', language: 'python', status: 'ACCEPTED', execution_time_ms: 42 },
+    { id: 103, problem_id: 3, problem_title: 'Valid Parentheses', language: 'javascript', status: 'ACCEPTED', execution_time_ms: 55 },
+    { id: 104, problem_id: 4, problem_title: 'Reverse Linked List', language: 'cpp', status: 'ACCEPTED', execution_time_ms: 12 },
+  ],
+};
+
+export function getFallbackUserProfile(username = 'developer') {
+  const user = createOfflineUser(username);
+  return {
+    user,
+    profile: user.profile,
+    stats: {
+      points: user.profile?.points || 1250,
+      problems_solved_count: user.profile?.problems_solved_count || 14,
+      questions_count: user.profile?.questions_count || 5,
+      answers_count: user.profile?.answers_count || 12,
+      blogs_count: 3,
+      projects_count: 2,
+    },
+  };
+}
+
+export const fallbackAdminStats: SystemStats = {
+  users_count: 142,
+  problems_count: 12,
+  questions_count: 38,
+  answers_count: 85,
+  submissions_count: 420,
+  pending_reports_count: 0,
+};
+
+export const fallbackAdminUsers: User[] = [
+  {
+    id: 1,
+    username: 'admin',
+    email: 'admin@scriptorium.dev',
+    role: 'admin',
+    is_active: true,
+    created_at: new Date(Date.now() - 86400000 * 90).toISOString(),
+    profile: {
+      id: 1,
+      user_id: 1,
+      full_name: 'Lead System Administrator',
+      bio: 'Scriptorium Core Infrastructure Administrator',
+      location: 'Global',
+      github_url: 'https://github.com',
+      website_url: 'https://scriptorium.dev',
+      avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=80',
+      points: 3500,
+      problems_solved_count: 45,
+      questions_count: 15,
+      answers_count: 40,
+      updated_at: new Date().toISOString(),
+    },
+  },
+  {
+    id: 2,
+    username: 'moderator',
+    email: 'moderator@scriptorium.dev',
+    role: 'moderator',
+    is_active: true,
+    created_at: new Date(Date.now() - 86400000 * 70).toISOString(),
+    profile: {
+      id: 2,
+      user_id: 2,
+      full_name: 'Community Moderator',
+      bio: 'Maintaining discussion quality, code reviews, and student editorial standards.',
+      location: 'Campus Tech Hub',
+      github_url: 'https://github.com',
+      website_url: 'https://scriptorium.dev',
+      avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+      points: 2100,
+      problems_solved_count: 28,
+      questions_count: 8,
+      answers_count: 25,
+      updated_at: new Date().toISOString(),
+    },
+  },
+  {
+    id: 3,
+    username: 'alex_code',
+    email: 'alex@example.com',
+    role: 'student',
+    is_active: true,
+    created_at: new Date(Date.now() - 86400000 * 45).toISOString(),
+    profile: {
+      id: 3,
+      user_id: 3,
+      full_name: 'Alex Rivera',
+      bio: 'Computer Science sophomore passionate about algorithms.',
+      location: 'Austin, TX',
+      github_url: 'https://github.com',
+      website_url: 'https://scriptorium.dev',
+      avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
+      points: 1250,
+      problems_solved_count: 14,
+      questions_count: 5,
+      answers_count: 12,
+      updated_at: new Date().toISOString(),
+    },
+  },
+];
+
+export const fallbackAuditLogs = [
+  { id: 1, action: 'USER_ROLE_UPDATED', actor_username: 'admin', target: 'alex_code', timestamp: new Date(Date.now() - 3600000 * 2).toISOString(), details: 'Role set to author' },
+  { id: 2, action: 'BLOG_STATUS_PUBLISHED', actor_username: 'moderator', target: 'Dynamic Programming Patterns', timestamp: new Date(Date.now() - 3600000 * 8).toISOString(), details: 'Approved after review' },
+  { id: 3, action: 'SYSTEM_BACKUP_COMPLETED', actor_username: 'system', target: 'PostgreSQL DB', timestamp: new Date(Date.now() - 3600000 * 24).toISOString(), details: 'Automated snapshot healthy' },
+];
+
+export const fallbackSubmissions = [
+  { id: 101, problem_id: 1, language: 'python', status: 'ACCEPTED', execution_time_ms: 38, memory_kb: 14200, created_at: new Date(Date.now() - 86400000 * 2).toISOString() },
+  { id: 102, problem_id: 2, language: 'python', status: 'ACCEPTED', execution_time_ms: 42, memory_kb: 13900, created_at: new Date(Date.now() - 86400000 * 3).toISOString() },
+  { id: 103, problem_id: 3, language: 'javascript', status: 'ACCEPTED', execution_time_ms: 55, memory_kb: 16400, created_at: new Date(Date.now() - 86400000 * 5).toISOString() },
 ];

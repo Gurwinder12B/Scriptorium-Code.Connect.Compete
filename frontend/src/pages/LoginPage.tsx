@@ -99,6 +99,29 @@ export const LoginPage: React.FC = () => {
               {loading ? 'Signing in...' : 'Sign in'}
               <ArrowRight className="w-4 h-4 ml-2" />
             </button>
+
+            <div className="relative flex py-1 items-center">
+              <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+              <span className="flex-shrink mx-3 text-xs uppercase tracking-wider text-slate-400 font-semibold">Or</span>
+              <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+            </div>
+
+            <button
+              type="button"
+              onClick={async () => {
+                setLoading(true);
+                try {
+                  await login({ login: 'developer', password: 'password' });
+                  navigate(from, { replace: true });
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="w-full flex justify-center items-center py-2.5 px-4 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none transition"
+            >
+              Explore as Guest Developer
+            </button>
           </form>
         </div>
       </div>
