@@ -1,4 +1,5 @@
-const API_BASE = '/api/v1';
+const envApiUrl = typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_API_BASE_URL : '';
+const API_BASE = (envApiUrl ? String(envApiUrl).replace(/\/+$/, '') : '') + '/api/v1';
 
 export class ApiError extends Error {
   code: string;
@@ -134,7 +135,6 @@ export const problemsApi = {
     return request<any[]>(`/problems?${query.toString()}`);
   },
   getProblem: (idOrSlug: string | number) => request<any>(`/problems/${idOrSlug}`),
-  getHints: (idOrSlug: string | number) => request<any[]>(`/problems/${idOrSlug}/hints`),
   createProblem: (data: any) =>
     request<any>('/problems', {
       method: 'POST',
@@ -145,6 +145,7 @@ export const problemsApi = {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
+  getHints: (idOrSlug: string | number) => request<any[]>(`/problems/${idOrSlug}/hints`),
 };
 
 export const submissionsApi = {
@@ -331,15 +332,7 @@ export const blogsApi = {
 };
 
 export const projectsApi = {
-  getProjects: (params: {
-    category?: string;
-    tag?: string;
-    author?: string;
-    q?: string;
-    sort?: string;
-    page?: number;
-    per_page?: number;
-  } = {}) => {
+  getProjects: (params: { category?: string; tag?: string; author?: string; q?: string; sort?: string; page?: number; per_page?: number } = {}) => {
     const searchParams = new URLSearchParams();
     if (params.category) searchParams.set('category', params.category);
     if (params.tag) searchParams.set('tag', params.tag);
@@ -369,44 +362,27 @@ export const projectsApi = {
     request<{ upvote_count: number; user_has_upvoted: boolean }>(`/projects/${id}/upvote`, {
       method: 'POST',
     }),
-  submitReview: (
-    id: number,
-    data: {
-      summary: string;
-      architecture_feedback?: string;
-      performance_feedback?: string;
-      security_feedback?: string;
-      ui_ux_feedback?: string;
-      rating_overall: number;
-    }
-  ) =>
+  addMedia: (id: number, data: any) =>
+    request<any>(`/projects/${id}/media`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  submitReview: (id: number, data: any) =>
     request<any>(`/projects/${id}/reviews`, {
       method: 'POST',
       body: JSON.stringify(data),
     }),
-  updateReviewStatus: (projectId: number, reviewId: number, status: 'OPEN' | 'ADDRESSED' | 'RESOLVED') =>
-    request<any>(`/projects/${projectId}/reviews/${reviewId}/status`, {
+  updateReviewStatus: (projectId: number, reviewId: number, status: string) =>
+    request<any>(`/projects/reviews/${reviewId}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     }),
   upvoteReview: (projectId: number, reviewId: number) =>
-    request<{ upvote_count: number; user_has_upvoted: boolean }>(
-      `/projects/${projectId}/reviews/${reviewId}/upvote`,
-      {
-        method: 'POST',
-      }
-    ),
-  addReviewComment: (
-    projectId: number,
-    reviewId: number,
-    data: { content: string; code_snippet?: string }
-  ) =>
-    request<any>(`/projects/${projectId}/reviews/${reviewId}/comments`, {
+    request<{ upvote_count: number; user_has_upvoted: boolean }>(`/projects/reviews/${reviewId}/upvote`, {
       method: 'POST',
-      body: JSON.stringify(data),
     }),
-  addMedia: (projectId: number, data: { media_url: string; caption?: string; display_order?: number }) =>
-    request<any>(`/projects/${projectId}/media`, {
+  addReviewComment: (projectId: number, reviewId: number, data: any) =>
+    request<any>(`/projects/reviews/${reviewId}/comments`, {
       method: 'POST',
       body: JSON.stringify(data),
     }),
@@ -417,7 +393,7 @@ export const clubsApi = {
     const searchParams = new URLSearchParams();
     if (params.category) searchParams.set('category', params.category);
     if (params.q) searchParams.set('q', params.q);
-    return request<any>(`/clubs?${searchParams.toString()}`);
+    return request<any[]>(`/clubs?${searchParams.toString()}`);
   },
   getClub: (idOrSlug: string | number) => request<any>(`/clubs/${idOrSlug}`),
   createClub: (data: any) =>
@@ -430,10 +406,12 @@ export const clubsApi = {
       method: 'POST',
     }),
   getAnnouncementsFeed: () => request<any[]>('/clubs/announcements/feed'),
+  getAnnouncements: (clubId: number) => request<any[]>(`/clubs/${clubId}/announcements`),
   createAnnouncement: (clubId: number, data: any) =>
     request<any>(`/clubs/${clubId}/announcements`, {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 };
+
 
