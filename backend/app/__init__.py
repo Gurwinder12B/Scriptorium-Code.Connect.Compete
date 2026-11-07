@@ -50,6 +50,13 @@ def create_app(config_name=None):
     app.register_blueprint(projects_bp)
     app.register_blueprint(clubs_bp)
 
+    # Ensure tables are created automatically
+    with app.app_context():
+        try:
+            db.create_all()
+        except Exception as e:
+            app.logger.warning(f"Could not auto-create tables: {e}")
+
     # Health check & system discovery endpoints
     @app.route("/health", methods=["GET"])
     def health():
