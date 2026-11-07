@@ -115,3 +115,4 @@ The entire screenshot gallery can be re-captured automatically at any time whene
 node scripts/capture_screenshots.js
 ```
 The script will authenticate via the API, launch headless Chrome/Edge, configure dark mode, visit every route, wait for assets and API data to settle, and save updated high-resolution images to this folder.
+

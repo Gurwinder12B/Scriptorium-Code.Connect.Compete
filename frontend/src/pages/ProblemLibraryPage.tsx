@@ -34,9 +34,10 @@ export const ProblemLibraryPage: React.FC = () => {
           tag: currentTag,
           q: searchQuery,
         });
-        setProblems(data);
+        setProblems(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error('Failed to load problems:', err);
+        setProblems([]);
       } finally {
         setLoading(false);
       }
@@ -141,7 +142,7 @@ export const ProblemLibraryPage: React.FC = () => {
       {/* Problems Table */}
       {loading ? (
         <LoadingSpinner text="Loading problems..." />
-      ) : problems.length === 0 ? (
+      ) : (problems || []).length === 0 ? (
         <EmptyState
           title="No problems found"
           description="Try adjusting your difficulty filter or search query."
@@ -161,7 +162,7 @@ export const ProblemLibraryPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
-                {problems.map((prob) => {
+                {(problems || []).map((prob) => {
                   const isSolved = prob.user_status === 'SOLVED';
                   const isAttempted = prob.user_status === 'ATTEMPTED';
 

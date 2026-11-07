@@ -69,7 +69,7 @@ export const ProjectShowcasePage: React.FC = () => {
         q: currentSearch || undefined,
         per_page: 24,
       });
-      setProjects(Array.isArray(data) ? data : data?.items || []);
+      setProjects(Array.isArray(data) ? data : (data as any)?.items || []);
     } catch (err) {
       console.error('Failed to load projects:', err);
     } finally {

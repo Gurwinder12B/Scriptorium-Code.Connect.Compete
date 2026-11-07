@@ -13,9 +13,10 @@ export const LeaderboardPage: React.FC = () => {
     async function loadLeaderboard() {
       try {
         const data = await leaderboardApi.getLeaderboard(50);
-        setRankings(data);
+        setRankings(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error('Failed to load leaderboard:', err);
+        setRankings([]);
       } finally {
         setLoading(false);
       }
@@ -54,7 +55,7 @@ export const LeaderboardPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
-                {rankings.map((entry) => {
+                {(rankings || []).map((entry) => {
                   const isTop3 = entry.rank <= 3;
                   return (
                     <tr

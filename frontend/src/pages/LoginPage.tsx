@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Code2, AlertCircle, ArrowRight, KeyRound } from 'lucide-react';
+import { Code2, AlertCircle, ArrowRight } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
@@ -32,12 +32,6 @@ export const LoginPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleFillDemo = (u: string, p: string) => {
-    setIdentifier(u);
-    setPassword(p);
-    setError(null);
   };
 
   return (
@@ -106,36 +100,6 @@ export const LoginPage: React.FC = () => {
               <ArrowRight className="w-4 h-4 ml-2" />
             </button>
           </form>
-
-          {/* Quick Demo Credentials for Reviewers */}
-          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-            <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <KeyRound className="w-3.5 h-3.5" /> Quick Demo Fill:
-            </p>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => handleFillDemo('admin', 'Admin123!')}
-                className="px-2 py-1.5 text-xs font-medium text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 dark:hover:bg-purple-900/60 rounded-lg border border-purple-200 dark:border-purple-800 transition"
-              >
-                Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFillDemo('moderator', 'Mod123!')}
-                className="px-2 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/60 rounded-lg border border-blue-200 dark:border-blue-800 transition"
-              >
-                Moderator
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFillDemo('developer', 'User123!')}
-                className="px-2 py-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 rounded-lg border border-emerald-200 dark:border-emerald-800 transition"
-              >
-                Developer
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

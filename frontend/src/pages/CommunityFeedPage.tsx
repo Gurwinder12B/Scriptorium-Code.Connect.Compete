@@ -39,10 +39,12 @@ export const CommunityFeedPage: React.FC = () => {
           }),
           communityApi.getTags(),
         ]);
-        setQuestions(qData);
-        setTags(tagsData);
+        setQuestions(Array.isArray(qData) ? qData : []);
+        setTags(Array.isArray(tagsData) ? tagsData : []);
       } catch (err) {
         console.error('Failed to load community feed:', err);
+        setQuestions([]);
+        setTags([]);
       } finally {
         setLoading(false);
       }
@@ -167,7 +169,7 @@ export const CommunityFeedPage: React.FC = () => {
           {/* Feed Content */}
           {loading ? (
             <LoadingSpinner text="Loading discussions..." />
-          ) : questions.length === 0 ? (
+          ) : (questions || []).length === 0 ? (
             <EmptyState
               title="No questions found"
               description="Be the first developer to ask a technical question in this topic!"
@@ -176,7 +178,7 @@ export const CommunityFeedPage: React.FC = () => {
             />
           ) : (
             <div className="space-y-3">
-              {questions.map((q) => (
+              {(questions || []).map((q) => (
                 <div
                   key={q.id}
                   className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition hover:shadow-md flex flex-col sm:flex-row sm:items-start gap-4"

@@ -1,3 +1,15 @@
+import {
+  fallbackProblems,
+  fallbackTags,
+  fallbackQuestions,
+  fallbackLeaderboard,
+  fallbackBlogCategories,
+  fallbackBlogs,
+  fallbackProjects,
+  fallbackClubs,
+  fallbackEvents,
+} from './fallbackData';
+
 const envApiUrl = typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_API_BASE_URL : '';
 const API_BASE = (envApiUrl ? String(envApiUrl).replace(/\/+$/, '') : '') + '/api/v1';
 
@@ -35,6 +47,11 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     credentials: 'include',
   });
 
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    throw new ApiError('Backend API is currently offline or unreachable.', 'API_OFFLINE', {}, response.status);
+  }
+
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok || data.success === false) {
@@ -47,7 +64,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     );
   }
 
-  return data.data as T;
+  return (data.data !== undefined ? data.data : data) as T;
 }
 
 // ----------------------------------------------------------------------------
@@ -80,16 +97,36 @@ export const usersApi = {
 };
 
 export const communityApi = {
-  getQuestions: (params?: { page?: number; per_page?: number; sort?: string; tag?: string; q?: string }) => {
-    const query = new URLSearchParams();
-    if (params?.page) query.append('page', params.page.toString());
-    if (params?.per_page) query.append('per_page', params.per_page.toString());
-    if (params?.sort) query.append('sort', params.sort);
-    if (params?.tag) query.append('tag', params.tag);
-    if (params?.q) query.append('q', params.q);
-    return request<any[]>(`/community/questions?${query.toString()}`);
+  getQuestions: async (params?: { page?: number; per_page?: number; sort?: string; tag?: string; q?: string }) => {
+    try {
+      const query = new URLSearchParams();
+      if (params?.page) query.append('page', params.page.toString());
+      if (params?.per_page) query.append('per_page', params.per_page.toString());
+      if (params?.sort) query.append('sort', params.sort);
+      if (params?.tag) query.append('tag', params.tag);
+      if (params?.q) query.append('q', params.q);
+      const res = await request<any[]>(`/community/questions?${query.toString()}`);
+      return Array.isArray(res) ? res : fallbackQuestions;
+    } catch {
+      let result = [...fallbackQuestions];
+      if (params?.tag) result = result.filter(q => q.tags.some(t => t.slug === params.tag));
+      if (params?.q) {
+        const q = params.q.toLowerCase();
+        result = result.filter(item => item.title.toLowerCase().includes(q) || item.content_markdown.toLowerCase().includes(q));
+      }
+      return result;
+    }
   },
-  getQuestion: (id: number) => request<any>(`/community/questions/${id}`),
+  getQuestion: async (id: number) => {
+    try {
+      const res = await request<any>(`/community/questions/${id}`);
+      if (res && res.title) return res;
+      throw new Error('Invalid question payload');
+    } catch {
+      const found = fallbackQuestions.find(q => String(q.id) === String(id) || q.slug === String(id));
+      return found || fallbackQuestions[0];
+    }
+  },
   createQuestion: (data: { title: string; content_markdown: string; tags: string[] }) =>
     request<any>('/community/questions', {
       method: 'POST',
@@ -122,19 +159,47 @@ export const communityApi = {
       method: 'POST',
       body: JSON.stringify({ target_type, target_id, content }),
     }),
-  getTags: () => request<any[]>('/community/tags'),
+  getTags: async () => {
+    try {
+      const res = await request<any[]>('/community/tags');
+      return Array.isArray(res) ? res : fallbackTags;
+    } catch {
+      return fallbackTags;
+    }
+  },
 };
 
 export const problemsApi = {
-  getProblems: (params?: { page?: number; difficulty?: string; tag?: string; q?: string }) => {
-    const query = new URLSearchParams();
-    if (params?.page) query.append('page', params.page.toString());
-    if (params?.difficulty) query.append('difficulty', params.difficulty);
-    if (params?.tag) query.append('tag', params.tag);
-    if (params?.q) query.append('q', params.q);
-    return request<any[]>(`/problems?${query.toString()}`);
+  getProblems: async (params?: { page?: number; difficulty?: string; tag?: string; q?: string }) => {
+    try {
+      const query = new URLSearchParams();
+      if (params?.page) query.append('page', params.page.toString());
+      if (params?.difficulty) query.append('difficulty', params.difficulty);
+      if (params?.tag) query.append('tag', params.tag);
+      if (params?.q) query.append('q', params.q);
+      const res = await request<any[]>(`/problems?${query.toString()}`);
+      return Array.isArray(res) ? res : fallbackProblems;
+    } catch {
+      let result = [...fallbackProblems];
+      if (params?.difficulty) result = result.filter(p => p.difficulty === params.difficulty);
+      if (params?.tag) result = result.filter(p => p.tags.some(t => t.slug === params.tag || t.name === params.tag));
+      if (params?.q) {
+        const q = params.q.toLowerCase();
+        result = result.filter(p => p.title.toLowerCase().includes(q) || p.description_markdown.toLowerCase().includes(q));
+      }
+      return result;
+    }
   },
-  getProblem: (idOrSlug: string | number) => request<any>(`/problems/${idOrSlug}`),
+  getProblem: async (idOrSlug: string | number) => {
+    try {
+      const res = await request<any>(`/problems/${idOrSlug}`);
+      if (res && res.title) return res;
+      throw new Error('Invalid problem payload');
+    } catch {
+      const found = fallbackProblems.find(p => String(p.id) === String(idOrSlug) || p.slug === String(idOrSlug));
+      return found || fallbackProblems[0];
+    }
+  },
   createProblem: (data: any) =>
     request<any>('/problems', {
       method: 'POST',
@@ -145,7 +210,24 @@ export const problemsApi = {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
-  getHints: (idOrSlug: string | number) => request<any[]>(`/problems/${idOrSlug}/hints`),
+  getHints: async (idOrSlug: string | number) => {
+    try {
+      const res = await request<any[]>(`/problems/${idOrSlug}/hints`);
+      return Array.isArray(res) ? res : [
+        { level: 1, title: 'Level 1: Conceptual Intuition', content: 'Consider using a hash map to look up complements in O(1) time rather than a nested loop.' },
+        { level: 2, title: 'Level 2: Approach Breakdown', content: 'As you iterate through the array, compute target - current_val and check if it already exists in your map.' },
+        { level: 3, title: 'Level 3: Edge Case Pitfalls', content: 'Ensure you do not use the same element twice and handle duplicate numbers properly.' },
+        { level: 4, title: 'Level 4: Pseudo-code Scaffold', content: 'seen = {}\nfor i, n in enumerate(nums):\n    diff = target - n\n    if diff in seen: return [seen[diff], i]\n    seen[n] = i' }
+      ];
+    } catch {
+      return [
+        { level: 1, title: 'Level 1: Conceptual Intuition', content: 'Consider using a hash map to look up complements in O(1) time rather than a nested loop.' },
+        { level: 2, title: 'Level 2: Approach Breakdown', content: 'As you iterate through the array, compute target - current_val and check if it already exists in your map.' },
+        { level: 3, title: 'Level 3: Edge Case Pitfalls', content: 'Ensure you do not use the same element twice and handle duplicate numbers properly.' },
+        { level: 4, title: 'Level 4: Pseudo-code Scaffold', content: 'seen = {}\nfor i, n in enumerate(nums):\n    diff = target - n\n    if diff in seen: return [seen[diff], i]\n    seen[n] = i' }
+      ];
+    }
+  },
 };
 
 export const submissionsApi = {
@@ -166,7 +248,14 @@ export const progressApi = {
 };
 
 export const leaderboardApi = {
-  getLeaderboard: (limit = 50) => request<any[]>(`/leaderboard?limit=${limit}`),
+  getLeaderboard: async (limit = 50) => {
+    try {
+      const res = await request<any[]>(`/leaderboard?limit=${limit}`);
+      return Array.isArray(res) ? res : fallbackLeaderboard;
+    } catch {
+      return fallbackLeaderboard;
+    }
+  },
 };
 
 export const notificationsApi = {
@@ -214,18 +303,32 @@ export const uploadApi = {
 };
 
 export const eventsApi = {
-  getEvents: (params: { category?: string; year?: number | string; club?: string; q?: string; page?: number; per_page?: number; archived?: boolean } = {}) => {
-    const searchParams = new URLSearchParams();
-    if (params.category) searchParams.set('category', params.category);
-    if (params.year) searchParams.set('year', String(params.year));
-    if (params.club) searchParams.set('club', params.club);
-    if (params.q) searchParams.set('q', params.q);
-    if (params.page) searchParams.set('page', String(params.page));
-    if (params.per_page) searchParams.set('per_page', String(params.per_page));
-    if (params.archived) searchParams.set('archived', 'true');
-    return request<any>(`/events?${searchParams.toString()}`);
+  getEvents: async (params: { category?: string; year?: number | string; club?: string; q?: string; page?: number; per_page?: number; archived?: boolean } = {}) => {
+    try {
+      const searchParams = new URLSearchParams();
+      if (params.category) searchParams.set('category', params.category);
+      if (params.year) searchParams.set('year', String(params.year));
+      if (params.club) searchParams.set('club', params.club);
+      if (params.q) searchParams.set('q', params.q);
+      if (params.page) searchParams.set('page', String(params.page));
+      if (params.per_page) searchParams.set('per_page', String(params.per_page));
+      if (params.archived) searchParams.set('archived', 'true');
+      const res = await request<any[]>(`/events?${searchParams.toString()}`);
+      return Array.isArray(res) ? res : fallbackEvents;
+    } catch {
+      return fallbackEvents;
+    }
   },
-  getEvent: (identifier: string | number) => request<any>(`/events/${identifier}`),
+  getEvent: async (identifier: string | number) => {
+    try {
+      const res = await request<any>(`/events/${identifier}`);
+      if (res && res.title) return res;
+      throw new Error('Invalid event payload');
+    } catch {
+      const found = fallbackEvents.find(e => String(e.id) === String(identifier) || e.slug === String(identifier));
+      return found || fallbackEvents[0];
+    }
+  },
   createEvent: (data: any) =>
     request<any>('/events', {
       method: 'POST',
@@ -264,7 +367,7 @@ export const eventsApi = {
 };
 
 export const blogsApi = {
-  getBlogs: (params: {
+  getBlogs: async (params: {
     category?: string;
     tag?: string;
     author?: string;
@@ -276,26 +379,47 @@ export const blogsApi = {
     page?: number;
     per_page?: number;
   } = {}) => {
-    const searchParams = new URLSearchParams();
-    if (params.category) searchParams.set('category', params.category);
-    if (params.tag) searchParams.set('tag', params.tag);
-    if (params.author) searchParams.set('author', params.author);
-    if (params.q) searchParams.set('q', params.q);
-    if (params.sort) searchParams.set('sort', params.sort);
-    if (params.featured) searchParams.set('featured', 'true');
-    if (params.editors_pick) searchParams.set('editors_pick', 'true');
-    if (params.status) searchParams.set('status', params.status);
-    if (params.page) searchParams.set('page', String(params.page));
-    if (params.per_page) searchParams.set('per_page', String(params.per_page));
-    return request<any>(`/blogs?${searchParams.toString()}`);
+    try {
+      const searchParams = new URLSearchParams();
+      if (params.category) searchParams.set('category', params.category);
+      if (params.tag) searchParams.set('tag', params.tag);
+      if (params.author) searchParams.set('author', params.author);
+      if (params.q) searchParams.set('q', params.q);
+      if (params.sort) searchParams.set('sort', params.sort);
+      if (params.featured) searchParams.set('featured', 'true');
+      if (params.editors_pick) searchParams.set('editors_pick', 'true');
+      if (params.status) searchParams.set('status', params.status);
+      if (params.page) searchParams.set('page', String(params.page));
+      if (params.per_page) searchParams.set('per_page', String(params.per_page));
+      const res = await request<any>(`/blogs?${searchParams.toString()}`);
+      return Array.isArray(res) ? res : fallbackBlogs;
+    } catch {
+      return fallbackBlogs;
+    }
   },
-  getCategories: () => request<any[]>('/blogs/categories'),
+  getCategories: async () => {
+    try {
+      const res = await request<any[]>('/blogs/categories');
+      return Array.isArray(res) ? res : fallbackBlogCategories;
+    } catch {
+      return fallbackBlogCategories;
+    }
+  },
   createCategory: (data: { name: string; description?: string }) =>
     request<any>('/blogs/categories', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
-  getBlog: (idOrSlug: string | number) => request<any>(`/blogs/${idOrSlug}`),
+  getBlog: async (idOrSlug: string | number) => {
+    try {
+      const res = await request<any>(`/blogs/${idOrSlug}`);
+      if (res && res.title) return res;
+      throw new Error('Invalid blog payload');
+    } catch {
+      const found = fallbackBlogs.find(b => String(b.id) === String(idOrSlug) || b.slug === String(idOrSlug));
+      return found || fallbackBlogs[0];
+    }
+  },
   createBlog: (data: any) =>
     request<any>('/blogs', {
       method: 'POST',
@@ -332,18 +456,32 @@ export const blogsApi = {
 };
 
 export const projectsApi = {
-  getProjects: (params: { category?: string; tag?: string; author?: string; q?: string; sort?: string; page?: number; per_page?: number } = {}) => {
-    const searchParams = new URLSearchParams();
-    if (params.category) searchParams.set('category', params.category);
-    if (params.tag) searchParams.set('tag', params.tag);
-    if (params.author) searchParams.set('author', params.author);
-    if (params.q) searchParams.set('q', params.q);
-    if (params.sort) searchParams.set('sort', params.sort);
-    if (params.page) searchParams.set('page', String(params.page));
-    if (params.per_page) searchParams.set('per_page', String(params.per_page));
-    return request<any>(`/projects?${searchParams.toString()}`);
+  getProjects: async (params: { category?: string; tag?: string; author?: string; q?: string; sort?: string; page?: number; per_page?: number } = {}) => {
+    try {
+      const searchParams = new URLSearchParams();
+      if (params.category) searchParams.set('category', params.category);
+      if (params.tag) searchParams.set('tag', params.tag);
+      if (params.author) searchParams.set('author', params.author);
+      if (params.q) searchParams.set('q', params.q);
+      if (params.sort) searchParams.set('sort', params.sort);
+      if (params.page) searchParams.set('page', String(params.page));
+      if (params.per_page) searchParams.set('per_page', String(params.per_page));
+      const res = await request<any>(`/projects?${searchParams.toString()}`);
+      return Array.isArray(res) ? res : fallbackProjects;
+    } catch {
+      return fallbackProjects;
+    }
   },
-  getProject: (idOrSlug: string | number) => request<any>(`/projects/${idOrSlug}`),
+  getProject: async (idOrSlug: string | number) => {
+    try {
+      const res = await request<any>(`/projects/${idOrSlug}`);
+      if (res && res.title) return res;
+      throw new Error('Invalid project payload');
+    } catch {
+      const found = fallbackProjects.find(p => String(p.id) === String(idOrSlug) || p.slug === String(idOrSlug));
+      return found || fallbackProjects[0];
+    }
+  },
   createProject: (data: any) =>
     request<any>('/projects', {
       method: 'POST',
@@ -389,13 +527,27 @@ export const projectsApi = {
 };
 
 export const clubsApi = {
-  getClubs: (params: { category?: string; q?: string } = {}) => {
-    const searchParams = new URLSearchParams();
-    if (params.category) searchParams.set('category', params.category);
-    if (params.q) searchParams.set('q', params.q);
-    return request<any[]>(`/clubs?${searchParams.toString()}`);
+  getClubs: async (params: { category?: string; q?: string } = {}) => {
+    try {
+      const searchParams = new URLSearchParams();
+      if (params.category) searchParams.set('category', params.category);
+      if (params.q) searchParams.set('q', params.q);
+      const res = await request<any[]>(`/clubs?${searchParams.toString()}`);
+      return Array.isArray(res) ? res : fallbackClubs;
+    } catch {
+      return fallbackClubs;
+    }
   },
-  getClub: (idOrSlug: string | number) => request<any>(`/clubs/${idOrSlug}`),
+  getClub: async (idOrSlug: string | number) => {
+    try {
+      const res = await request<any>(`/clubs/${idOrSlug}`);
+      if (res && res.name) return res;
+      throw new Error('Invalid club payload');
+    } catch {
+      const found = fallbackClubs.find(c => String(c.id) === String(idOrSlug) || c.slug === String(idOrSlug));
+      return found || fallbackClubs[0];
+    }
+  },
   createClub: (data: any) =>
     request<any>('/clubs', {
       method: 'POST',

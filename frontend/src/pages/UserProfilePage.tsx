@@ -54,7 +54,7 @@ export const UserProfilePage: React.FC = () => {
           blogsApi.getBlogs({ author: username, status: 'PUBLISHED' }).catch(() => ({ data: { items: [] } }))
         ]);
         setProfileData(data);
-        setUserBlogs(blogsRes.data?.items || []);
+        setUserBlogs(Array.isArray(blogsRes) ? blogsRes : (blogsRes as any)?.items || (blogsRes as any)?.data?.items || []);
         const p = data.profile || {};
         setFullName(p.full_name || '');
         setBio(p.bio || '');
