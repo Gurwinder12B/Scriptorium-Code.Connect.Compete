@@ -238,3 +238,4 @@ export const QuizLeaderboardPage: React.FC = () => {
     </div>
   );
 };
+

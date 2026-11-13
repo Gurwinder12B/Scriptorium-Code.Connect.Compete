@@ -434,3 +434,4 @@ export const QuizDetailPage: React.FC = () => {
     </div>
   );
 };
+

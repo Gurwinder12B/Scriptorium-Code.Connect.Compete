@@ -731,3 +731,4 @@ export const QuizDiscoveryPage: React.FC = () => {
     </div>
   );
 };
+

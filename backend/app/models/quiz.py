@@ -176,3 +176,4 @@ class QuizSubmission(db.Model):
             "submitted_at": self.submitted_at.isoformat() if self.submitted_at else None,
             "answers": self.answers if include_answers else None,
         }
+

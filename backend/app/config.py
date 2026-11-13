@@ -9,10 +9,17 @@ class Config:
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "scriptorium-jwt-secret-key-at-least-32-chars")
     JWT_EXPIRATION = timedelta(minutes=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES_MINUTES", "1440")))
     
-    # Database config: default to SQLite if DATABASE_URL is not set or MySQL is unreachable
-    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///scriptorium.db")
+    # Database config: default to SQLite if DATABASE_URL is not set or MySQL/PostgreSQL is unreachable
+    raw_db_url = os.getenv("DATABASE_URL", "sqlite:///scriptorium.db")
+    if raw_db_url.startswith("postgres://"):
+        raw_db_url = raw_db_url.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = raw_db_url
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    }
 
     # Media & Uploads
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")

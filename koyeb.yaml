@@ -1,0 +1,24 @@
+name: scriptorium-backend
+services:
+  - name: api
+    type: web
+    regions:
+      - fra
+    git:
+      repository: github.com/Gurwinder12B/Scriptorium-Code.Connect.Compete
+      branch: main
+      workdir: backend
+      build_command: pip install -r requirements.txt && python seed.py
+      run_command: gunicorn -b 0.0.0.0:8000 run:app
+    routes:
+      - path: /
+        port: 8000
+    env:
+      - key: FLASK_ENV
+        value: production
+      - key: PORT
+        value: "8000"
+      - key: CORS_ORIGINS
+        value: "https://scriptorium-code.netlify.app,http://localhost:5173"
+      - key: JUDGE_PROVIDER
+        value: mock
