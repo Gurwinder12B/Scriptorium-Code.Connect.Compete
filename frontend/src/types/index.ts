@@ -492,3 +492,116 @@ export interface ClubItem {
   officers?: ClubMemberItem[];
 }
 
+// ----------------------------------------------------------------------------
+// Quiz Competition & Answer Key Types
+// ----------------------------------------------------------------------------
+
+export interface QuizQuestionOption {
+  id: string; // e.g. "A", "B", "C", "D"
+  text: string;
+}
+
+export interface QuizQuestion {
+  id: number;
+  quiz_id: number;
+  question_text: string;
+  question_type: 'multiple_choice' | 'true_false';
+  options: QuizQuestionOption[];
+  correct_answer?: string; // Answer Key value, e.g. "A"
+  points: number;
+  explanation?: string; // Solution explanation from answer key
+  order_index: number;
+}
+
+export interface QuizTeamMember {
+  name: string;
+  email?: string;
+  role?: string;
+  username?: string;
+}
+
+export interface QuizTeam {
+  id: number;
+  quiz_id: number;
+  name: string;
+  join_code: string;
+  leader_id: number;
+  leader_name: string;
+  members: QuizTeamMember[];
+  member_count: number;
+  status: 'REGISTERED' | 'IN_PROGRESS' | 'SUBMITTED';
+  created_at: string;
+}
+
+export interface AnswerKeyItem {
+  question_id: number;
+  question_text: string;
+  question_type: string;
+  options: QuizQuestionOption[];
+  selected_answer?: string;
+  correct_answer: string;
+  is_correct: boolean;
+  points_earned: number;
+  max_points: number;
+  explanation: string;
+}
+
+export interface QuizScorecard {
+  submission_id: number;
+  quiz_id: number;
+  quiz_title: string;
+  team_name: string;
+  score: number;
+  total_points: number;
+  percentage: number;
+  passed: boolean;
+  passing_score: number;
+  correct_count: number;
+  incorrect_count: number;
+  total_questions: number;
+  time_taken_seconds: number;
+  submitted_at: string;
+  answer_key_review: AnswerKeyItem[];
+}
+
+export interface QuizLeaderboardEntry {
+  rank: number;
+  submission_id: number;
+  team_id?: number;
+  team_name: string;
+  score: number;
+  total_points: number;
+  percentage: number;
+  correct_count: number;
+  time_taken_seconds: number;
+  submitted_at: string;
+}
+
+export interface QuizItem {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  category: string;
+  cover_image_url: string;
+  duration_minutes: number;
+  max_teams?: number;
+  min_team_size: number;
+  max_team_size: number;
+  total_points: number;
+  passing_score: number;
+  shuffle_questions: boolean;
+  allow_review: boolean;
+  status: 'UPCOMING' | 'LIVE' | 'ENDED' | 'DRAFT';
+  start_time?: string;
+  end_time?: string;
+  is_published: boolean;
+  questions_count: number;
+  teams_count: number;
+  submissions_count: number;
+  created_by?: string;
+  created_at: string;
+  updated_at?: string;
+  questions?: QuizQuestion[];
+}
+

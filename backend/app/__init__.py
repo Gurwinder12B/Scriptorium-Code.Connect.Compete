@@ -33,6 +33,7 @@ def create_app(config_name=None):
     from app.blogs.routes import blogs_bp
     from app.projects.routes import projects_bp
     from app.clubs.routes import clubs_bp
+    from app.quizzes.routes import quizzes_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(users_bp)
@@ -49,6 +50,7 @@ def create_app(config_name=None):
     app.register_blueprint(blogs_bp)
     app.register_blueprint(projects_bp)
     app.register_blueprint(clubs_bp)
+    app.register_blueprint(quizzes_bp)
 
     # Ensure tables are created automatically
     with app.app_context():

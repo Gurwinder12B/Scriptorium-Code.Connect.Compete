@@ -32,6 +32,11 @@ import { ClubsDiscoveryPage } from './pages/ClubsDiscoveryPage';
 import { ClubDetailPage } from './pages/ClubDetailPage';
 import { DsaVisualizerPage } from './pages/DsaVisualizerPage';
 import { LearningHubPage } from './pages/LearningHubPage';
+import { QuizDiscoveryPage } from './pages/QuizDiscoveryPage';
+import { QuizDetailPage } from './pages/QuizDetailPage';
+import { QuizLiveRoomPage } from './pages/QuizLiveRoomPage';
+import { QuizResultsPage } from './pages/QuizResultsPage';
+import { QuizLeaderboardPage } from './pages/QuizLeaderboardPage';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode; requiredRole?: string[] }> = ({
@@ -83,6 +88,11 @@ export const App: React.FC = () => {
                 <Route path="/community/questions/:id" element={<QuestionDetailPage />} />
                 <Route path="/problems" element={<ProblemLibraryPage />} />
                 <Route path="/problems/:id" element={<ProblemDetailPage />} />
+                <Route path="/quizzes" element={<QuizDiscoveryPage />} />
+                <Route path="/quizzes/:id" element={<QuizDetailPage />} />
+                <Route path="/quizzes/:id/live" element={<QuizLiveRoomPage />} />
+                <Route path="/quizzes/:id/results/:submissionId" element={<QuizResultsPage />} />
+                <Route path="/quizzes/:id/leaderboard" element={<QuizLeaderboardPage />} />
                 <Route path="/events" element={<EventGalleryPage />} />
                 <Route path="/events/:id" element={<EventDetailPage />} />
                 <Route path="/blogs" element={<BlogDiscoveryPage />} />

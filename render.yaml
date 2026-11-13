@@ -20,3 +20,4 @@ services:
         value: mock
       - key: PORT
         value: 10000
+

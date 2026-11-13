@@ -19,6 +19,7 @@ from app.models.project import (
     project_tags_table,
 )
 from app.models.club import Club, ClubMember, ClubAnnouncement
+from app.models.quiz import Quiz, QuizQuestion, QuizTeam, QuizSubmission
 
 __all__ = [
     "User",
@@ -60,5 +61,9 @@ __all__ = [
     "Club",
     "ClubMember",
     "ClubAnnouncement",
+    "Quiz",
+    "QuizQuestion",
+    "QuizTeam",
+    "QuizSubmission",
 ]
 

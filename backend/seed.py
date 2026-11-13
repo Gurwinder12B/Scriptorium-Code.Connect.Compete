@@ -700,6 +700,254 @@ A student-led research and development group focusing on generative intelligence
     db.session.commit()
     print("Clubs and announcements seeded successfully!")
 
+def _seed_quizzes(admin_user, dev_user, student_user):
+    from app.models.quiz import Quiz, QuizQuestion, QuizTeam, QuizSubmission
+    print("Seeding customizable quiz competitions with answer keys and team leaderboards...")
+
+    q1 = Quiz(
+        title="National Collegiate Algorithms & Data Structures Quiz Bowl",
+        slug="national-collegiate-algorithms-quiz-bowl",
+        description="High-velocity algorithmic challenge covering dynamic programming, graph traversal, amortized complexity, and tree balancing. Compete in teams of 1 to 4 members with automated instant grading and solution answer keys.",
+        category="Algorithms & CS",
+        cover_image_url="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&auto=format&fit=crop&q=80",
+        duration_minutes=25,
+        max_teams=60,
+        min_team_size=1,
+        max_team_size=4,
+        total_points=50,
+        passing_score=30,
+        status="LIVE",
+        is_published=True,
+        created_by_id=admin_user.id,
+    )
+    db.session.add(q1)
+    db.session.flush()
+
+    questions_q1 = [
+        QuizQuestion(
+            quiz_id=q1.id,
+            question_text="What is the worst-case time complexity of searching for an element in an unaugmented AVL Tree with n nodes?",
+            question_type="multiple_choice",
+            options=[
+                {"id": "A", "text": "O(1)"},
+                {"id": "B", "text": "O(log n)"},
+                {"id": "C", "text": "O(n)"},
+                {"id": "D", "text": "O(n log n)"}
+            ],
+            correct_answer="B",
+            points=10,
+            explanation="An AVL tree strictly maintains the balance factor of every node between -1 and +1. Therefore, its height is strictly bounded by approximately 1.44 log2(n), guaranteeing O(log n) worst-case search time.",
+            order_index=1
+        ),
+        QuizQuestion(
+            quiz_id=q1.id,
+            question_text="Which algorithm is optimal for finding the shortest path between all pairs of vertices in a directed graph with negative edge weights but no negative cycles?",
+            question_type="multiple_choice",
+            options=[
+                {"id": "A", "text": "Dijkstra's Algorithm with Fibonacci Heap"},
+                {"id": "B", "text": "Floyd-Warshall Algorithm"},
+                {"id": "C", "text": "Kruskal's Algorithm"},
+                {"id": "D", "text": "Breadth-First Search (BFS)"}
+            ],
+            correct_answer="B",
+            points=10,
+            explanation="Floyd-Warshall uses dynamic programming to solve all-pairs shortest paths in O(V^3) time and correctly handles negative edge weights, provided there are no negative-weight cycles.",
+            order_index=2
+        ),
+        QuizQuestion(
+            quiz_id=q1.id,
+            question_text="In amortized complexity analysis, what is the amortized cost of inserting an element into a dynamic array (std::vector or Python list) that doubles its capacity when full?",
+            question_type="multiple_choice",
+            options=[
+                {"id": "A", "text": "O(1)"},
+                {"id": "B", "text": "O(log n)"},
+                {"id": "C", "text": "O(n)"},
+                {"id": "D", "text": "O(n^2)"}
+            ],
+            correct_answer="A",
+            points=10,
+            explanation="Although resizing takes O(n) work copying elements, it occurs only every 2^k steps. The aggregate cost of n insertions is at most 3n operations, yielding an amortized constant O(1) time per insertion.",
+            order_index=3
+        ),
+        QuizQuestion(
+            quiz_id=q1.id,
+            question_text="Which algorithmic paradigm does the Fast Fourier Transform (FFT) for O(n log n) polynomial multiplication employ?",
+            question_type="multiple_choice",
+            options=[
+                {"id": "A", "text": "Greedy Choice Property"},
+                {"id": "B", "text": "Divide and Conquer"},
+                {"id": "C", "text": "Simulated Annealing"},
+                {"id": "D", "text": "Linear Programming"}
+            ],
+            correct_answer="B",
+            points=10,
+            explanation="The Cooley-Tukey FFT algorithm splits polynomial evaluations recursively into even- and odd-indexed subpolynomials using complex roots of unity, which is a classic divide-and-conquer strategy.",
+            order_index=4
+        ),
+        QuizQuestion(
+            quiz_id=q1.id,
+            question_text="What is the space complexity required to perform topological sorting of a Directed Acyclic Graph (DAG) with V vertices and E edges using Kahn's algorithm?",
+            question_type="multiple_choice",
+            options=[
+                {"id": "A", "text": "O(1)"},
+                {"id": "B", "text": "O(V)"},
+                {"id": "C", "text": "O(E)"},
+                {"id": "D", "text": "O(V * E)"}
+            ],
+            correct_answer="B",
+            points=10,
+            explanation="Kahn's algorithm maintains an in-degree array of size V and a FIFO queue holding vertices with 0 in-degrees, requiring O(V) auxiliary space.",
+            order_index=5
+        ),
+    ]
+    db.session.add_all(questions_q1)
+    db.session.flush()
+
+    # Seed demo teams
+    t1 = QuizTeam(
+        quiz_id=q1.id,
+        name="Team ByteVanguard",
+        join_code="BYTE2026",
+        leader_id=dev_user.id,
+        leader_name=dev_user.username,
+        members=[
+            {"name": "Elena Rostova", "email": "elena@scriptorium.dev", "role": "Systems Lead"},
+            {"name": "Marcus Vance", "email": "marcus@scriptorium.dev", "role": "Algorithmic Theorist"}
+        ],
+        status="SUBMITTED",
+    )
+    t2 = QuizTeam(
+        quiz_id=q1.id,
+        name="Team NeuralKnights",
+        join_code="NEUR4040",
+        leader_id=student_user.id,
+        leader_name=student_user.username,
+        members=[
+            {"name": "Devin Chen", "email": "devin@scriptorium.dev", "role": "ML Engineer"},
+            {"name": "Priya Sharma", "email": "priya@scriptorium.dev", "role": "Full-Stack Dev"}
+        ],
+        status="SUBMITTED",
+    )
+    db.session.add_all([t1, t2])
+    db.session.flush()
+
+    # Seed submissions
+    sub1 = QuizSubmission(
+        quiz_id=q1.id,
+        team_id=t1.id,
+        team_name=t1.name,
+        user_id=dev_user.id,
+        answers={"1": "B", "2": "B", "3": "A", "4": "B", "5": "B"},
+        score=50,
+        total_points=50,
+        percentage=100.0,
+        correct_count=5,
+        incorrect_count=0,
+        time_taken_seconds=540,
+        is_graded=True,
+    )
+    sub2 = QuizSubmission(
+        quiz_id=q1.id,
+        team_id=t2.id,
+        team_name=t2.name,
+        user_id=student_user.id,
+        answers={"1": "B", "2": "B", "3": "A", "4": "A", "5": "B"},
+        score=40,
+        total_points=50,
+        percentage=80.0,
+        correct_count=4,
+        incorrect_count=1,
+        time_taken_seconds=680,
+        is_graded=True,
+    )
+    db.session.add_all([sub1, sub2])
+
+    # Second Quiz: Full-Stack Web Architectures Sprint
+    q2 = Quiz(
+        title="Full-Stack Web Architectures & Systems Design Sprint",
+        slug="full-stack-web-architectures-sprint",
+        description="Test your team's knowledge on microservices, relational vs NoSQL caching patterns, CORS protocols, and zero-trust authentication flows.",
+        category="Web Systems",
+        cover_image_url="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&auto=format&fit=crop&q=80",
+        duration_minutes=20,
+        max_teams=40,
+        min_team_size=1,
+        max_team_size=3,
+        total_points=40,
+        passing_score=25,
+        status="LIVE",
+        is_published=True,
+        created_by_id=admin_user.id,
+    )
+    db.session.add(q2)
+    db.session.flush()
+
+    questions_q2 = [
+        QuizQuestion(
+            quiz_id=q2.id,
+            question_text="Which HTTP status code is most appropriate when a client sends a syntactically valid JSON request whose values fail domain validation rules?",
+            question_type="multiple_choice",
+            options=[
+                {"id": "A", "text": "400 Bad Request"},
+                {"id": "B", "text": "404 Not Found"},
+                {"id": "C", "text": "422 Unprocessable Content"},
+                {"id": "D", "text": "500 Internal Server Error"}
+            ],
+            correct_answer="C",
+            points=10,
+            explanation="RFC 9110 specifies 422 Unprocessable Content for semantic errors where the syntax is valid but semantic constraints fail.",
+            order_index=1
+        ),
+        QuizQuestion(
+            quiz_id=q2.id,
+            question_text="In database indexing, what data structure is most commonly used for relational B-Tree indexes that allows fast equality and range queries?",
+            question_type="multiple_choice",
+            options=[
+                {"id": "A", "text": "Hash Table"},
+                {"id": "B", "text": "B+ Tree"},
+                {"id": "C", "text": "Skip List"},
+                {"id": "D", "text": "Red-Black Tree"}
+            ],
+            correct_answer="B",
+            points=10,
+            explanation="B+ Trees store all records or row pointers exclusively in the leaf nodes, which are linked together, providing exceptional sequential range scan performance and balanced logarithmic depth.",
+            order_index=2
+        ),
+        QuizQuestion(
+            quiz_id=q2.id,
+            question_text="What is the primary benefit of HTTP/2 multiplexing over HTTP/1.1 pipelining?",
+            question_type="multiple_choice",
+            options=[
+                {"id": "A", "text": "Eliminates application-layer Head-of-Line (HoL) blocking across a single TCP connection"},
+                {"id": "B", "text": "Eliminates the need for SSL/TLS handshakes"},
+                {"id": "C", "text": "Stores responses permanently in local cache without headers"},
+                {"id": "D", "text": "Converts all JSON requests into binary Protobuf automatically"}
+            ],
+            correct_answer="A",
+            points=10,
+            explanation="HTTP/2 breaks requests and responses into binary frames multiplexed over one TCP socket, eliminating the Head-of-Line blocking inherent to HTTP/1.1 order-dependent pipelining.",
+            order_index=3
+        ),
+        QuizQuestion(
+            quiz_id=q2.id,
+            question_text="When configuring Cross-Origin Resource Sharing (CORS), what triggers the browser to send an HTTP OPTIONS preflight request before the main request?",
+            question_type="multiple_choice",
+            options=[
+                {"id": "A", "text": "Using custom HTTP headers (e.g. Authorization or X-Custom-Header) or non-simple methods like PUT/DELETE"},
+                {"id": "B", "text": "Any standard GET request with query parameters"},
+                {"id": "C", "text": "Sending text/plain content without credentials"},
+                {"id": "D", "text": "Only when accessed through an incognito browser window"}
+            ],
+            correct_answer="A",
+            points=10,
+            explanation="Browsers mandate a CORS preflight OPTIONS request if the request uses non-simple methods (PUT, PATCH, DELETE) or headers other than standard safelisted headers (Accept, Accept-Language, Content-Language).",
+            order_index=4
+        ),
+    ]
+    db.session.add_all(questions_q2)
+    db.session.commit()
+    print("Quizzes, questions, answer keys, and teams seeded successfully!")
+
 def seed_database():
     app = create_app("development")
     with app.app_context():
@@ -730,6 +978,11 @@ def seed_database():
             if not Club.query.first():
                 print("Seeding missing technical clubs into existing database...")
                 _seed_clubs(admin_user, dev_user, student_user)
+
+            from app.models.quiz import Quiz
+            if not Quiz.query.first():
+                print("Seeding missing quiz competitions into existing database...")
+                _seed_quizzes(admin_user, dev_user, student_user)
 
             print("Database check complete. Skipping main user seed.")
             return
@@ -998,7 +1251,8 @@ Each process gets its own independent Python interpreter and memory space, effec
         _seed_blogs(created_users["admin"], created_users["developer"], created_users["student"])
         _seed_projects(created_users["admin"], created_users["developer"], created_users["student"])
         _seed_clubs(created_users["admin"], created_users["developer"], created_users["student"])
-        print("Database seeded successfully with demo users, tags, problems, test cases, events, blogs, showcase projects, and technical clubs!")
+        _seed_quizzes(created_users["admin"], created_users["developer"], created_users["student"])
+        print("Database seeded successfully with demo users, tags, problems, test cases, events, blogs, showcase projects, technical clubs, and quiz competitions!")
 
 if __name__ == "__main__":
     seed_database()

@@ -15,6 +15,9 @@ import {
   fallbackAdminUsers,
   fallbackAuditLogs,
   fallbackSubmissions,
+  fallbackQuizzes,
+  fallbackQuizTeams,
+  fallbackQuizLeaderboard,
 } from './fallbackData';
 
 const rawEnvUrl = typeof import.meta !== 'undefined' && (import.meta as any).env
@@ -758,5 +761,282 @@ export const clubsApi = {
       body: JSON.stringify(data),
     }),
 };
+
+// ----------------------------------------------------------------------------
+// Quizzes & Competitions API
+// ----------------------------------------------------------------------------
+
+function getLocalQuizzes(): any[] {
+  try {
+    const raw = localStorage.getItem('scriptorium_custom_quizzes');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalQuizzes(quizzes: any[]) {
+  try {
+    localStorage.setItem('scriptorium_custom_quizzes', JSON.stringify(quizzes));
+  } catch {}
+}
+
+export const quizzesApi = {
+  getQuizzes: async (params: { category?: string; status?: string; q?: string; page?: number; per_page?: number } = {}) => {
+    try {
+      const searchParams = new URLSearchParams();
+      if (params.category) searchParams.set('category', params.category);
+      if (params.status) searchParams.set('status', params.status);
+      if (params.q) searchParams.set('q', params.q);
+      if (params.page) searchParams.set('page', String(params.page));
+      if (params.per_page) searchParams.set('per_page', String(params.per_page));
+      const res = await request<any>(`/quizzes?${searchParams.toString()}`);
+      if (res && Array.isArray(res.items)) return res.items;
+      if (Array.isArray(res)) return res;
+      throw new Error('Fallback to local quizzes');
+    } catch {
+      const customs = getLocalQuizzes();
+      let all = [...customs, ...fallbackQuizzes];
+      if (params.category) all = all.filter(q => q.category.toLowerCase().includes(params.category!.toLowerCase()));
+      if (params.status && params.status !== 'ALL') all = all.filter(q => q.status === params.status);
+      if (params.q) {
+        const query = params.q.toLowerCase();
+        all = all.filter(q => q.title.toLowerCase().includes(query) || q.description.toLowerCase().includes(query));
+      }
+      return all;
+    }
+  },
+
+  getQuiz: async (idOrSlug: string | number, revealAnswerKey = false) => {
+    try {
+      const query = revealAnswerKey ? '?reveal_answer_key=true' : '';
+      const res = await request<any>(`/quizzes/${idOrSlug}${query}`);
+      if (res && res.title) return res;
+      throw new Error('Invalid quiz response');
+    } catch {
+      const customs = getLocalQuizzes();
+      const all = [...customs, ...fallbackQuizzes];
+      const found = all.find(q => String(q.id) === String(idOrSlug) || q.slug === String(idOrSlug));
+      return found || fallbackQuizzes[0];
+    }
+  },
+
+  createQuiz: async (data: any) => {
+    try {
+      return await request<any>('/quizzes', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      // Offline fallback
+      const customs = getLocalQuizzes();
+      const slug = (data.title || 'custom-quiz').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const newQuiz = {
+        ...data,
+        id: Date.now(),
+        slug: `${slug}-${Math.floor(Math.random() * 1000)}`,
+        questions_count: (data.questions || []).length,
+        teams_count: 0,
+        submissions_count: 0,
+        status: data.status || 'LIVE',
+        is_published: true,
+        created_by: 'Organizing Team',
+        created_at: new Date().toISOString(),
+      };
+      customs.unshift(newQuiz);
+      saveLocalQuizzes(customs);
+      return newQuiz;
+    }
+  },
+
+  updateQuiz: async (quizId: number, data: any) => {
+    try {
+      return await request<any>(`/quizzes/${quizId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const customs = getLocalQuizzes();
+      const idx = customs.findIndex(q => q.id === quizId);
+      if (idx !== -1) {
+        customs[idx] = { ...customs[idx], ...data, updated_at: new Date().toISOString() };
+        saveLocalQuizzes(customs);
+        return customs[idx];
+      }
+      return { success: true };
+    }
+  },
+
+  deleteQuiz: async (quizId: number) => {
+    try {
+      return await request<any>(`/quizzes/${quizId}`, { method: 'DELETE' });
+    } catch {
+      const customs = getLocalQuizzes();
+      saveLocalQuizzes(customs.filter(q => q.id !== quizId));
+      return { success: true };
+    }
+  },
+
+  registerTeam: async (quizId: number, data: { team_name: string; members: any[] }) => {
+    try {
+      return await request<any>(`/quizzes/${quizId}/teams/register`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      const code = 'TEAM' + Math.floor(1000 + Math.random() * 9000);
+      const team = {
+        id: Date.now(),
+        quiz_id: quizId,
+        name: data.team_name,
+        join_code: code,
+        leader_id: 1,
+        leader_name: 'developer',
+        members: data.members || [],
+        member_count: (data.members || []).length + 1,
+        status: 'REGISTERED',
+        created_at: new Date().toISOString(),
+      };
+      try {
+        const stored = JSON.parse(localStorage.getItem(`scriptorium_quiz_${quizId}_teams`) || '[]');
+        stored.push(team);
+        localStorage.setItem(`scriptorium_quiz_${quizId}_teams`, JSON.stringify(stored));
+      } catch {}
+      return team;
+    }
+  },
+
+  joinTeam: async (quizId: number, joinCode: string) => {
+    try {
+      return await request<any>(`/quizzes/${quizId}/teams/join`, {
+        method: 'POST',
+        body: JSON.stringify({ join_code: joinCode }),
+      });
+    } catch {
+      return { success: true, message: `Joined team with code ${joinCode}` };
+    }
+  },
+
+  submitQuiz: async (quizId: number, data: { team_id?: number; team_name?: string; answers: Record<string, string>; time_taken_seconds: number }) => {
+    try {
+      return await request<any>(`/quizzes/${quizId}/submit`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+    } catch {
+      // Offline Instant Grading & Answer Key Computation!
+      const customs = getLocalQuizzes();
+      const all = [...customs, ...fallbackQuizzes];
+      const quiz = all.find(q => q.id === quizId) || fallbackQuizzes[0];
+      const questions = quiz.questions || [];
+
+      let score = 0;
+      let correctCount = 0;
+      let incorrectCount = 0;
+      const answerKeyReview: any[] = [];
+
+      questions.forEach((q: any) => {
+        const studentAns = data.answers[String(q.id)];
+        const correctAns = String(q.correct_answer || 'A').trim();
+        const isCorrect = studentAns ? String(studentAns).trim().toUpperCase() === correctAns.toUpperCase() : false;
+
+        if (isCorrect) {
+          score += q.points;
+          correctCount++;
+        } else {
+          incorrectCount++;
+        }
+
+        answerKeyReview.push({
+          question_id: q.id,
+          question_text: q.question_text,
+          question_type: q.question_type,
+          options: q.options,
+          selected_answer: studentAns || null,
+          correct_answer: correctAns,
+          is_correct: isCorrect,
+          points_earned: isCorrect ? q.points : 0,
+          max_points: q.points,
+          explanation: q.explanation || 'Verified with competition answer key.',
+        });
+      });
+
+      const totalPoints = questions.reduce((acc: number, q: any) => acc + (q.points || 0), 0) || quiz.total_points || 50;
+      const percentage = Math.round((score / totalPoints) * 100);
+
+      const scorecard = {
+        submission_id: Date.now(),
+        quiz_id: quizId,
+        quiz_title: quiz.title,
+        team_name: data.team_name || 'My Team',
+        score,
+        total_points: totalPoints,
+        percentage,
+        passed: score >= (quiz.passing_score || 25),
+        passing_score: quiz.passing_score || 25,
+        correct_count: correctCount,
+        incorrect_count: incorrectCount,
+        total_questions: questions.length,
+        time_taken_seconds: data.time_taken_seconds,
+        submitted_at: new Date().toISOString(),
+        answer_key_review: answerKeyReview,
+      };
+
+      // Save scorecard locally
+      try {
+        localStorage.setItem(`scriptorium_submission_${scorecard.submission_id}`, JSON.stringify(scorecard));
+        const lbKey = `scriptorium_quiz_${quizId}_lb`;
+        const existingLb = JSON.parse(localStorage.getItem(lbKey) || '[]');
+        existingLb.push({
+          rank: existingLb.length + 1,
+          submission_id: scorecard.submission_id,
+          team_name: scorecard.team_name,
+          score,
+          total_points: totalPoints,
+          percentage,
+          correct_count: correctCount,
+          time_taken_seconds: data.time_taken_seconds,
+          submitted_at: scorecard.submitted_at,
+        });
+        existingLb.sort((a: any, b: any) => b.score - a.score || a.time_taken_seconds - b.time_taken_seconds);
+        existingLb.forEach((entry: any, i: number) => { entry.rank = i + 1; });
+        localStorage.setItem(lbKey, JSON.stringify(existingLb));
+      } catch {}
+
+      return scorecard;
+    }
+  },
+
+  getLeaderboard: async (quizId: number) => {
+    try {
+      const res = await request<any>(`/quizzes/${quizId}/leaderboard`);
+      if (res && Array.isArray(res.leaderboard)) return res.leaderboard;
+      if (Array.isArray(res)) return res;
+      throw new Error('Fallback to local leaderboard');
+    } catch {
+      try {
+        const local = localStorage.getItem(`scriptorium_quiz_${quizId}_lb`);
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+      return fallbackQuizLeaderboard;
+    }
+  },
+
+  getSubmission: async (quizId: number, submissionId: number) => {
+    try {
+      return await request<any>(`/quizzes/${quizId}/submissions/${submissionId}`);
+    } catch {
+      try {
+        const local = localStorage.getItem(`scriptorium_submission_${submissionId}`);
+        if (local) return JSON.parse(local);
+      } catch {}
+      return null;
+    }
+  },
+};
+
 
 
