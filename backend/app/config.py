@@ -6,7 +6,7 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "scriptorium-dev-secret-key-32-chars-at-least")
-    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "scriptorium-jwt-secret-key-at-least-32-chars")
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY") or os.getenv("SECRET_KEY") or "scriptorium-jwt-secret-key-at-least-32-chars"
     JWT_EXPIRATION = timedelta(minutes=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES_MINUTES", "1440")))
     
     # Database config: Neon PostgreSQL, external cloud DB, or SQLite fallback

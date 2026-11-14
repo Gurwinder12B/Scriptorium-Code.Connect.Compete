@@ -32,6 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (err) {
         console.error('Session validation error:', err);
         localStorage.removeItem('scriptorium_token');
+        localStorage.removeItem('scriptorium_offline_user');
         setToken(null);
         setUser(null);
       } finally {
@@ -46,6 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const res = await authApi.login(loginData);
       localStorage.setItem('scriptorium_token', res.token);
+      localStorage.removeItem('scriptorium_offline_user');
       setToken(res.token);
       setUser(res.user);
     } finally {
@@ -58,6 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const res = await authApi.register(regData);
       localStorage.setItem('scriptorium_token', res.token);
+      localStorage.removeItem('scriptorium_offline_user');
       setToken(res.token);
       setUser(res.user);
     } finally {
@@ -72,6 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Ignore logout network errors
     } finally {
       localStorage.removeItem('scriptorium_token');
+      localStorage.removeItem('scriptorium_offline_user');
       setToken(null);
       setUser(null);
     }

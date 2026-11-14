@@ -90,49 +90,18 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
 export const authApi = {
   login: async (loginData: { login: string; password: string }) => {
-    try {
-      return await request<{ user: any; token: string }>('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify(loginData),
-      });
-    } catch (err: any) {
-      if (
-        err.code === 'API_OFFLINE' ||
-        err.message?.includes('offline') ||
-        err.message?.includes('Failed to fetch') ||
-        err.status === 404 ||
-        err.status === 502
-      ) {
-        const user = createOfflineUser(loginData.login);
-        const token = `offline_token_${Date.now()}`;
-        localStorage.setItem('scriptorium_offline_user', JSON.stringify(user));
-        return { user, token };
-      }
-      throw err;
-    }
+    localStorage.removeItem('scriptorium_offline_user');
+    return await request<{ user: any; token: string }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(loginData),
+    });
   },
   register: async (regData: { username: string; email: string; password: string }) => {
-    try {
-      return await request<{ user: any; token: string }>('/auth/register', {
-        method: 'POST',
-        body: JSON.stringify(regData),
-      });
-    } catch (err: any) {
-      if (
-        err.code === 'API_OFFLINE' ||
-        err.message?.includes('offline') ||
-        err.message?.includes('Failed to fetch') ||
-        err.status === 404 ||
-        err.status === 502
-      ) {
-        const user = createOfflineUser(regData.username);
-        user.email = regData.email;
-        const token = `offline_token_${Date.now()}`;
-        localStorage.setItem('scriptorium_offline_user', JSON.stringify(user));
-        return { user, token };
-      }
-      throw err;
-    }
+    localStorage.removeItem('scriptorium_offline_user');
+    return await request<{ user: any; token: string }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(regData),
+    });
   },
   logout: async () => {
     try {
@@ -140,21 +109,12 @@ export const authApi = {
     } catch {
       // Ignore network errors on logout
     }
+    localStorage.removeItem('scriptorium_token');
     localStorage.removeItem('scriptorium_offline_user');
     return { message: 'Logged out successfully' };
   },
   me: async () => {
-    try {
-      return await request<any>('/auth/me');
-    } catch {
-      const stored = localStorage.getItem('scriptorium_offline_user');
-      if (stored) {
-        try {
-          return JSON.parse(stored);
-        } catch {}
-      }
-      return createOfflineUser('developer');
-    }
+    return await request<any>('/auth/me');
   },
 };
 

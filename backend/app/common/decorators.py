@@ -6,7 +6,12 @@ from app.models.user import User
 
 def get_current_user_from_request():
     token = None
-    auth_header = request.headers.get("Authorization")
+    auth_header = (
+        request.headers.get("Authorization")
+        or request.headers.get("authorization")
+        or request.environ.get("HTTP_AUTHORIZATION")
+        or request.environ.get("authorization")
+    )
     if auth_header and auth_header.startswith("Bearer "):
         token = auth_header.split(" ", 1)[1].strip()
     elif "access_token" in request.cookies:
@@ -15,7 +20,7 @@ def get_current_user_from_request():
     if not token:
         return None
 
-    payload = decode_access_token(token)
+    payload, _ = decode_access_token(token)
     if not payload or "sub" not in payload:
         return None
 
