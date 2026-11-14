@@ -948,8 +948,8 @@ def _seed_quizzes(admin_user, dev_user, student_user):
     db.session.commit()
     print("Quizzes, questions, answer keys, and teams seeded successfully!")
 
-def seed_database():
-    app = create_app("development")
+def seed_database(target_app=None):
+    app = target_app or create_app(os.getenv("FLASK_ENV", "development"))
     with app.app_context():
         print("Creating all tables...")
         db.create_all()

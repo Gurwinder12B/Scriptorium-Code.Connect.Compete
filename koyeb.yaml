@@ -22,3 +22,4 @@ services:
         value: "https://scriptorium-code.netlify.app,http://localhost:5173"
       - key: JUDGE_PROVIDER
         value: mock
+

@@ -60,9 +60,36 @@ def create_app(config_name=None):
             app.logger.warning(f"Could not auto-create tables: {e}")
 
     # Health check & system discovery endpoints
+    @app.route("/", methods=["GET"])
+    def root_index():
+        db_type = "Neon PostgreSQL" if "neon.tech" in str(app.config.get("SQLALCHEMY_DATABASE_URI", "")) else "Connected Database"
+        return success_response(data={
+            "product": "SCRIPTORIUM API",
+            "tagline": "Code. Connect. Compete.",
+            "status": "online",
+            "database": db_type,
+            "version": "1.0.0",
+            "endpoints": {
+                "health": "/health",
+                "api": "/api/v1",
+                "init_db": "/api/v1/system/init-db"
+            }
+        })
+
     @app.route("/health", methods=["GET"])
     def health():
         return success_response(data={"status": "healthy", "service": "Scriptorium API", "version": "1.0.0"})
+
+    @app.route("/api/v1/system/init-db", methods=["GET", "POST"])
+    def init_database():
+        from app.models.user import User
+        try:
+            db.create_all()
+            from seed import seed_database
+            seed_database(app)
+            return success_response(message="Database initialized and populated successfully with Scriptorium full platform dataset!")
+        except Exception as e:
+            return error_response(f"Database initialization error: {str(e)}", 500)
 
     # Static uploads handler
     @app.route("/uploads/<path:filename>", methods=["GET"])
