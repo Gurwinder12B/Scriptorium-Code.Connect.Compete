@@ -209,18 +209,27 @@ def _seed_blogs(admin_user, dev_user, student_user):
     cat_map = {}
     for index, (c_name, c_desc) in enumerate(categories_def):
         c_slug = c_name.lower().replace(" & ", "-").replace(" ", "-")
-        cat = BlogCategory.query.filter_by(slug=c_slug).first()
+        cat = BlogCategory.query.filter(
+            (BlogCategory.name.ilike(c_name)) | (BlogCategory.slug.ilike(c_slug))
+        ).first()
         if not cat:
-            cat = BlogCategory(
-                name=c_name,
-                slug=c_slug,
-                description=c_desc,
-                display_order=index,
-                is_active=True
-            )
-            db.session.add(cat)
-            db.session.flush()
-        cat_map[c_slug] = cat
+            try:
+                cat = BlogCategory(
+                    name=c_name,
+                    slug=c_slug,
+                    description=c_desc,
+                    display_order=index,
+                    is_active=True
+                )
+                db.session.add(cat)
+                db.session.flush()
+            except Exception:
+                db.session.rollback()
+                cat = BlogCategory.query.filter(
+                    (BlogCategory.name.ilike(c_name)) | (BlogCategory.slug.ilike(c_slug))
+                ).first()
+        if cat:
+            cat_map[c_slug] = cat
 
     now = datetime.now(timezone.utc)
 
@@ -407,12 +416,22 @@ def _seed_projects(admin_user, dev_user, student_user):
     tag_objs = {}
     for tname in tags_data:
         tslug = slugify(tname)
-        t = ProjectTag.query.filter_by(slug=tslug).first()
+        t = ProjectTag.query.filter(
+            (ProjectTag.name.ilike(tname)) | (ProjectTag.slug.ilike(tslug))
+        ).first()
         if not t:
-            t = ProjectTag(name=tname, slug=tslug)
-            db.session.add(t)
-            db.session.flush()
-        tag_objs[tslug] = t
+            try:
+                t = ProjectTag(name=tname, slug=tslug)
+                db.session.add(t)
+                db.session.flush()
+            except Exception:
+                db.session.rollback()
+                t = ProjectTag.query.filter(
+                    (ProjectTag.name.ilike(tname)) | (ProjectTag.slug.ilike(tslug))
+                ).first()
+        if t:
+            tag_objs[tslug] = t
+            tag_objs[tname.lower()] = t
 
     # Project 1: NeuralFlow
     p1 = Project(
@@ -704,9 +723,11 @@ def _seed_quizzes(admin_user, dev_user, student_user):
     from app.models.quiz import Quiz, QuizQuestion, QuizTeam, QuizSubmission
     print("Seeding customizable quiz competitions with answer keys and team leaderboards...")
 
-    q1 = Quiz(
-        title="National Collegiate Algorithms & Data Structures Quiz Bowl",
-        slug="national-collegiate-algorithms-quiz-bowl",
+    q1 = Quiz.query.filter_by(slug="national-collegiate-algorithms-quiz-bowl").first()
+    if not q1:
+        q1 = Quiz(
+            title="National Collegiate Algorithms & Data Structures Quiz Bowl",
+            slug="national-collegiate-algorithms-quiz-bowl",
         description="High-velocity algorithmic challenge covering dynamic programming, graph traversal, amortized complexity, and tree balancing. Compete in teams of 1 to 4 members with automated instant grading and solution answer keys.",
         category="Algorithms & CS",
         cover_image_url="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&auto=format&fit=crop&q=80",
@@ -863,24 +884,26 @@ def _seed_quizzes(admin_user, dev_user, student_user):
     db.session.add_all([sub1, sub2])
 
     # Second Quiz: Full-Stack Web Architectures Sprint
-    q2 = Quiz(
-        title="Full-Stack Web Architectures & Systems Design Sprint",
-        slug="full-stack-web-architectures-sprint",
-        description="Test your team's knowledge on microservices, relational vs NoSQL caching patterns, CORS protocols, and zero-trust authentication flows.",
-        category="Web Systems",
-        cover_image_url="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&auto=format&fit=crop&q=80",
-        duration_minutes=20,
-        max_teams=40,
-        min_team_size=1,
-        max_team_size=3,
-        total_points=40,
-        passing_score=25,
-        status="LIVE",
-        is_published=True,
-        created_by_id=admin_user.id,
-    )
-    db.session.add(q2)
-    db.session.flush()
+    q2 = Quiz.query.filter_by(slug="full-stack-web-architectures-sprint").first()
+    if not q2:
+        q2 = Quiz(
+            title="Full-Stack Web Architectures & Systems Design Sprint",
+            slug="full-stack-web-architectures-sprint",
+            description="Test your team's knowledge on microservices, relational vs NoSQL caching patterns, CORS protocols, and zero-trust authentication flows.",
+            category="Web Systems",
+            cover_image_url="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&auto=format&fit=crop&q=80",
+            duration_minutes=20,
+            max_teams=40,
+            min_team_size=1,
+            max_team_size=3,
+            total_points=40,
+            passing_score=25,
+            status="LIVE",
+            is_published=True,
+            created_by_id=admin_user.id,
+        )
+        db.session.add(q2)
+        db.session.flush()
 
     questions_q2 = [
         QuizQuestion(
@@ -997,24 +1020,27 @@ def seed_database(target_app=None):
 
         created_users = {}
         for username, email, password, role, full_name, bio in users:
-            u = User(
-                username=username,
-                email=email,
-                password_hash=hash_password(password),
-                role=role,
-                is_active=True
-            )
-            db.session.add(u)
-            db.session.flush()
+            u = User.query.filter((User.username == username) | (User.email == email)).first()
+            if not u:
+                u = User(
+                    username=username,
+                    email=email,
+                    password_hash=hash_password(password),
+                    role=role,
+                    is_active=True
+                )
+                db.session.add(u)
+                db.session.flush()
 
-            p = Profile(
-                user_id=u.id,
-                full_name=full_name,
-                bio=bio,
-                points=100 if role == "admin" else 50,
-                problems_solved_count=5 if username == "developer" else 1
-            )
-            db.session.add(p)
+                p = Profile(
+                    user_id=u.id,
+                    full_name=full_name,
+                    bio=bio,
+                    points=100 if role == "admin" else 50,
+                    problems_solved_count=5 if username == "developer" else 1
+                )
+                db.session.add(p)
+                db.session.flush()
             created_users[username] = u
 
         print("Seeding tags...")
@@ -1031,10 +1057,17 @@ def seed_database(target_app=None):
 
         tags_map = {}
         for name, desc in tag_definitions:
-            t = Tag(name=name, slug=name, description=desc, usage_count=5)
-            db.session.add(t)
-            tags_map[name] = t
-        db.session.flush()
+            t = Tag.query.filter((Tag.slug.ilike(name)) | (Tag.name.ilike(name))).first()
+            if not t:
+                try:
+                    t = Tag(name=name, slug=name, description=desc, usage_count=5)
+                    db.session.add(t)
+                    db.session.flush()
+                except Exception:
+                    db.session.rollback()
+                    t = Tag.query.filter((Tag.slug.ilike(name)) | (Tag.name.ilike(name))).first()
+            if t:
+                tags_map[name] = t
 
         print("Seeding coding problems...")
         problems_data = [
@@ -1154,59 +1187,66 @@ An input string is valid if:
         ]
 
         for p_data in problems_data:
-            prob = Problem(
-                title=p_data["title"],
-                slug=p_data["slug"],
-                difficulty=p_data["difficulty"],
-                description_markdown=p_data["description_markdown"],
-                input_format=p_data["input_format"],
-                output_format=p_data["output_format"],
-                constraints=p_data["constraints"],
-                starter_templates=p_data["starter_templates"],
-                time_limit_ms=2000,
-                memory_limit_mb=128,
-                is_published=True,
-                created_by=created_users["admin"].id
-            )
-            for t_name in p_data["tags"]:
-                if t_name in tags_map:
-                    prob.tags.append(tags_map[t_name])
-
-            for i, tc in enumerate(p_data["test_cases"]):
-                test_case = TestCase(
-                    input_data=tc["input"],
-                    expected_output=tc["output"],
-                    is_sample=tc["is_sample"],
-                    is_hidden=tc["is_hidden"],
-                    explanation=tc["explanation"],
-                    order_index=i
+            prob = Problem.query.filter_by(slug=p_data["slug"]).first()
+            if not prob:
+                prob = Problem(
+                    title=p_data["title"],
+                    slug=p_data["slug"],
+                    difficulty=p_data["difficulty"],
+                    description_markdown=p_data["description_markdown"],
+                    input_format=p_data["input_format"],
+                    output_format=p_data["output_format"],
+                    constraints=p_data["constraints"],
+                    starter_templates=p_data["starter_templates"],
+                    time_limit_ms=2000,
+                    memory_limit_mb=128,
+                    is_published=True,
+                    created_by=created_users["admin"].id
                 )
-                prob.test_cases.append(test_case)
+                for t_name in p_data["tags"]:
+                    if t_name in tags_map:
+                        prob.tags.append(tags_map[t_name])
 
-            db.session.add(prob)
+                for i, tc in enumerate(p_data["test_cases"]):
+                    test_case = TestCase(
+                        input_data=tc["input"],
+                        expected_output=tc["output"],
+                        is_sample=tc["is_sample"],
+                        is_hidden=tc["is_hidden"],
+                        explanation=tc["explanation"],
+                        order_index=i
+                    )
+                    prob.test_cases.append(test_case)
+
+                db.session.add(prob)
 
         print("Seeding community discussions...")
-        q1 = Question(
-            author_id=created_users["student"].id,
-            title="How does Python's GIL affect multi-threading and CPU-bound tasks?",
-            slug="how-does-pythons-gil-affect-multithreading-and-cpu-bound-tasks",
-            content_markdown="""I've been learning concurrency in Python and noticed that running multiple threads on CPU-heavy tasks didn't speed up my execution. 
+        q1_slug = "how-does-pythons-gil-affect-multithreading-and-cpu-bound-tasks"
+        q1 = Question.query.filter_by(slug=q1_slug).first()
+        if not q1:
+            q1 = Question(
+                author_id=created_users["student"].id,
+                title="How does Python's GIL affect multi-threading and CPU-bound tasks?",
+                slug=q1_slug,
+                content_markdown="""I've been learning concurrency in Python and noticed that running multiple threads on CPU-heavy tasks didn't speed up my execution. 
 
 Could someone explain what the **Global Interpreter Lock (GIL)** is, why it exists in CPython, and what the recommended alternative is for parallelizing CPU-bound workloads in Python?""",
-            view_count=42,
-            vote_count=8,
-            answer_count=2,
-            is_solved=True
-        )
-        q1.tags.append(tags_map["python"])
-        q1.tags.append(tags_map["web-development"])
-        db.session.add(q1)
-        db.session.flush()
+                view_count=42,
+                vote_count=8,
+                answer_count=2,
+                is_solved=True
+            )
+            if "python" in tags_map:
+                q1.tags.append(tags_map["python"])
+            if "web-development" in tags_map:
+                q1.tags.append(tags_map["web-development"])
+            db.session.add(q1)
+            db.session.flush()
 
-        a1 = Answer(
-            question_id=q1.id,
-            author_id=created_users["developer"].id,
-            content_markdown="""The **Global Interpreter Lock (GIL)** is a mutex that prevents multiple native threads from executing Python bytecodes at once in the CPython implementation.
+            a1 = Answer(
+                question_id=q1.id,
+                author_id=created_users["developer"].id,
+                content_markdown="""The **Global Interpreter Lock (GIL)** is a mutex that prevents multiple native threads from executing Python bytecodes at once in the CPython implementation.
 
 ### Why does it exist?
 1. Simplifies memory management in CPython (which uses reference counting).
@@ -1229,23 +1269,23 @@ if __name__ == '__main__':
 ```
 
 Each process gets its own independent Python interpreter and memory space, effectively bypassing the GIL!""",
-            vote_count=12,
-            is_accepted=True
-        )
-        db.session.add(a1)
-        db.session.flush()
+                vote_count=12,
+                is_accepted=True
+            )
+            db.session.add(a1)
+            db.session.flush()
 
-        q1.accepted_answer_id = a1.id
+            q1.accepted_answer_id = a1.id
 
-        # Comment on question
-        c1 = Comment(
-            author_id=created_users["moderator"].id,
-            target_type="question",
-            target_id=q1.id,
-            content="Great question! Also check out the upcoming free-threaded Python (PEP 703) if you're experimenting with Python 3.13+."
-        )
-        db.session.add(c1)
-        db.session.commit()
+            # Comment on question
+            c1 = Comment(
+                author_id=created_users["moderator"].id,
+                target_type="question",
+                target_id=q1.id,
+                content="Great question! Also check out the upcoming free-threaded Python (PEP 703) if you're experimenting with Python 3.13+."
+            )
+            db.session.add(c1)
+            db.session.commit()
 
         _seed_events(created_users["admin"], created_users["developer"])
         _seed_blogs(created_users["admin"], created_users["developer"], created_users["student"])

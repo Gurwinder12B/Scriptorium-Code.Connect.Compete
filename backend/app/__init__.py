@@ -94,6 +94,10 @@ def create_app(config_name=None):
             seed_database(app)
             return success_response(message="Database initialized and populated successfully with Scriptorium full platform dataset!")
         except Exception as e:
+            try:
+                db.session.rollback()
+            except Exception:
+                pass
             return error_response(f"Database initialization error: {str(e)}", 500)
 
     # Static uploads handler
