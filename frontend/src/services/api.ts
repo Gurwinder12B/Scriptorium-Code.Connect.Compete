@@ -20,10 +20,11 @@ import {
   fallbackQuizLeaderboard,
 } from './fallbackData';
 
+const DEFAULT_BACKEND_URL = 'https://scriptorium-api-seven.vercel.app';
 const rawEnvUrl = typeof import.meta !== 'undefined' && (import.meta as any).env
-  ? ((import.meta as any).env.VITE_API_BASE_URL || (import.meta as any).env.VITE_API_URL || '')
-  : '';
-let API_BASE = '/api/v1';
+  ? ((import.meta as any).env.VITE_API_BASE_URL || (import.meta as any).env.VITE_API_URL || DEFAULT_BACKEND_URL)
+  : DEFAULT_BACKEND_URL;
+let API_BASE = `${DEFAULT_BACKEND_URL}/api/v1`;
 if (rawEnvUrl) {
   const trimmed = String(rawEnvUrl).replace(/\/+$/, '');
   API_BASE = trimmed.endsWith('/api/v1') ? trimmed : `${trimmed}/api/v1`;

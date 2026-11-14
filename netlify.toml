@@ -5,6 +5,13 @@
   publish = "dist"
   command = "npm run build"
 
+# Proxy API calls directly to live Vercel backend
+[[redirects]]
+  from = "/api/*"
+  to = "https://scriptorium-api-seven.vercel.app/api/:splat"
+  status = 200
+  force = true
+
 # SPA Fallback: Direct all client routes to index.html with HTTP 200
 [[redirects]]
   from = "/*"
