@@ -24,9 +24,18 @@ def get_current_user_from_request():
     if not payload or "sub" not in payload:
         return None, f"DECODE_FAIL:{err}"
 
-    user = User.query.filter_by(id=payload["sub"], is_active=True).first()
+    user_id_raw = payload.get("user_id") or payload.get("sub")
+    if not user_id_raw:
+        return None, "NO_USER_ID_IN_TOKEN"
+
+    try:
+        user_id = int(user_id_raw)
+    except (ValueError, TypeError):
+        return None, f"INVALID_USER_ID_FORMAT:{user_id_raw}"
+
+    user = User.query.filter_by(id=user_id, is_active=True).first()
     if not user:
-        return None, f"USER_NOT_FOUND:{payload.get('sub')}"
+        return None, f"USER_NOT_FOUND:{user_id}"
     return user, None
 
 def require_auth(fn):

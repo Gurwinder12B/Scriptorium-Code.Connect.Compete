@@ -27,7 +27,8 @@ def create_access_token(user_id: int, username: str, role: str) -> str:
 
     secret = get_jwt_secret()
     payload = {
-        "sub": user_id,
+        "sub": str(user_id),
+        "user_id": int(user_id),
         "username": username,
         "role": role,
         "iat": now,
