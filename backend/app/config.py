@@ -20,12 +20,17 @@ class Config:
         else:
             raw_db_url = "sqlite:///scriptorium.db"
 
-    # In serverless environments, pg8000 is pure Python (no C dependencies / no libpq.so)
+    # In serverless environments, use pure-Python pg8000 driver with ssl_context
     if raw_db_url.startswith("postgresql://") and not raw_db_url.startswith("postgresql+"):
-        try:
-            import psycopg2
-        except Exception:
-            raw_db_url = raw_db_url.replace("postgresql://", "postgresql+pg8000://", 1)
+        if os.getenv("VERCEL"):
+            clean_url = raw_db_url.split("?")[0]
+            raw_db_url = clean_url.replace("postgresql://", "postgresql+pg8000://", 1)
+        else:
+            try:
+                import psycopg2
+            except Exception:
+                clean_url = raw_db_url.split("?")[0]
+                raw_db_url = clean_url.replace("postgresql://", "postgresql+pg8000://", 1)
 
     DATABASE_URL = raw_db_url
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
@@ -36,7 +41,8 @@ class Config:
         "pool_recycle": 300,
     }
     if "pg8000" in raw_db_url:
-        engine_opts["connect_args"] = {"ssl_context": True}
+        import ssl
+        engine_opts["connect_args"] = {"ssl_context": ssl.create_default_context()}
 
     SQLALCHEMY_ENGINE_OPTIONS = engine_opts
 
