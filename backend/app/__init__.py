@@ -61,6 +61,8 @@ def create_app(config_name=None):
 
     # Health check & system discovery endpoints
     @app.route("/", methods=["GET"])
+    @app.route("/api/index.py", methods=["GET"])
+    @app.route("/api/index", methods=["GET"])
     def root_index():
         db_type = "Neon PostgreSQL" if "neon.tech" in str(app.config.get("SQLALCHEMY_DATABASE_URI", "")) else "Connected Database"
         return success_response(data={
