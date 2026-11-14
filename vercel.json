@@ -1,17 +1,15 @@
 {
   "version": 2,
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "backend/**"
+    }
+  },
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.py"
-    },
-    {
-      "source": "/health",
-      "destination": "/api/index.py"
-    },
-    {
-      "source": "/",
+      "source": "/(.*)",
       "destination": "/api/index.py"
     }
   ]
 }
+

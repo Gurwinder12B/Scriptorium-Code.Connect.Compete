@@ -82,10 +82,12 @@ def create_app(config_name=None):
 
     @app.route("/api/v1/system/init-db", methods=["GET", "POST"])
     def init_database():
-        from app.models.user import User
         try:
             db.create_all()
-            from seed import seed_database
+            try:
+                from seed import seed_database
+            except ImportError:
+                from backend.seed import seed_database
             seed_database(app)
             return success_response(message="Database initialized and populated successfully with Scriptorium full platform dataset!")
         except Exception as e:

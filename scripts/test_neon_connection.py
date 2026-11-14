@@ -36,3 +36,4 @@ def test_neon_connection(connection_uri=None):
 if __name__ == "__main__":
     uri_arg = sys.argv[1] if len(sys.argv) > 1 else None
     test_neon_connection(uri_arg)
+

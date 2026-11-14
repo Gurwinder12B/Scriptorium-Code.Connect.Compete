@@ -9,10 +9,16 @@ class Config:
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "scriptorium-jwt-secret-key-at-least-32-chars")
     JWT_EXPIRATION = timedelta(minutes=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES_MINUTES", "1440")))
     
-    # Database config: default to SQLite if DATABASE_URL is not set or MySQL/PostgreSQL is unreachable
-    raw_db_url = os.getenv("DATABASE_URL", "sqlite:///scriptorium.db")
+    # Database config: Neon PostgreSQL, external cloud DB, or SQLite fallback
+    raw_db_url = os.getenv("DATABASE_URL", "").strip()
     if raw_db_url.startswith("postgres://"):
         raw_db_url = raw_db_url.replace("postgres://", "postgresql://", 1)
+    elif not raw_db_url:
+        # If no DATABASE_URL is provided, fallback to SQLite (/tmp for Vercel/serverless)
+        if os.getenv("VERCEL"):
+            raw_db_url = "sqlite:////tmp/scriptorium.db"
+        else:
+            raw_db_url = "sqlite:///scriptorium.db"
     DATABASE_URL = raw_db_url
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -35,13 +41,18 @@ class Config:
     JUDGE_MEMORY_LIMIT_MB = int(os.getenv("JUDGE_MEMORY_LIMIT_MB", "128"))
     
     # CORS
-    CORS_ORIGINS = [
-        origin.strip()
-        for origin in os.getenv(
-            "CORS_ORIGINS",
-            "https://scriptorium-code.netlify.app,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173",
-        ).split(",")
-    ]
+    cors_env = os.getenv("CORS_ORIGINS", "").strip()
+    if cors_env:
+        CORS_ORIGINS = [origin.strip() for origin in cors_env.split(",") if origin.strip()]
+    else:
+        CORS_ORIGINS = [
+            "https://scriptorium-code.netlify.app",
+            r"^https:\/\/.*\.netlify\.app$",
+            r"^https:\/\/.*\.vercel\.app$",
+            "http://localhost:5173",
+            "http://localhost:3000",
+            "http://127.0.0.1:5173",
+        ]
 
 class DevelopmentConfig(Config):
     DEBUG = True
