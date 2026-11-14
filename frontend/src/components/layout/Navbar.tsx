@@ -417,6 +417,16 @@ export const Navbar: React.FC = () => {
                 <LayoutDashboard className="w-5 h-5 mr-3 text-slate-400" />
                 Dashboard
               </Link>
+              {(user?.role === 'admin' || user?.role === 'moderator') && (
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center px-3 py-2 rounded-lg text-base font-medium text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40"
+                >
+                  <Shield className="w-5 h-5 mr-3 text-purple-600 dark:text-purple-400" />
+                  Admin Console
+                </Link>
+              )}
               <button
                 onClick={() => {
                   handleLogout();
