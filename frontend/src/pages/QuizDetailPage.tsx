@@ -108,21 +108,21 @@ export const QuizDetailPage: React.FC = () => {
 
     setRegistering(true);
     try {
-      await quizzesApi.joinTeam(quiz.id, joinCodeInput.trim());
-      const mockTeam: QuizTeam = {
+      const joinedTeam = await quizzesApi.joinTeam(quiz.id, joinCodeInput.trim());
+      const teamObj: QuizTeam = joinedTeam?.id ? joinedTeam : {
         id: Date.now(),
         quiz_id: quiz.id,
         name: `Team ${joinCodeInput.trim()}`,
         join_code: joinCodeInput.trim(),
-        leader_id: 1,
-        leader_name: 'Team Leader',
+        leader_id: user?.id || 1,
+        leader_name: user?.username || 'Team Leader',
         members: [{ name: user?.username || 'You', email: user?.email || '' }],
         member_count: 2,
         status: 'REGISTERED',
         created_at: new Date().toISOString(),
       };
-      setRegisteredTeam(mockTeam);
-      localStorage.setItem(`scriptorium_my_team_${quiz.id}`, JSON.stringify(mockTeam));
+      setRegisteredTeam(teamObj);
+      localStorage.setItem(`scriptorium_my_team_${quiz.id}`, JSON.stringify(teamObj));
       alert('Joined team successfully!');
     } catch (err: any) {
       alert(err.message || 'Failed to join team.');

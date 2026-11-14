@@ -212,6 +212,7 @@ export const AdminDashboardPage: React.FC = () => {
                       className="text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 p-1 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                     >
                       <option value="user">User</option>
+                      <option value="developer">Developer</option>
                       <option value="moderator">Moderator</option>
                       <option value="admin">Admin</option>
                     </select>

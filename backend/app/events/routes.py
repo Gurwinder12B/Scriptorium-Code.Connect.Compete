@@ -30,7 +30,7 @@ def list_events():
 
     # Non-privileged users only see published and non-archived events
     user = getattr(g, "current_user", None)
-    is_admin_or_mod = user and user.role in ("admin", "moderator", "club_coordinator")
+    is_admin_or_mod = user and user.role in ("admin", "developer", "moderator")
     if not is_admin_or_mod:
         query = query.filter_by(is_published=True, is_archived=False)
     else:
@@ -83,7 +83,7 @@ def get_event(identifier: str):
         raise NotFoundError("Event not found.")
 
     user = getattr(g, "current_user", None)
-    is_admin_or_mod = user and user.role in ("admin", "moderator", "club_coordinator")
+    is_admin_or_mod = user and user.role in ("admin", "developer", "moderator")
     if not event.is_published and not is_admin_or_mod:
         raise NotFoundError("Event is not yet published.")
 
@@ -91,7 +91,7 @@ def get_event(identifier: str):
 
 @events_bp.route("", methods=["POST"])
 @require_auth
-@require_role("admin", "moderator", "club_coordinator")
+@require_role("admin", "developer")
 def create_event():
     data = request.get_json(silent=True) or {}
     title = data.get("title", "").strip()
@@ -169,7 +169,7 @@ def create_event():
 
 @events_bp.route("/<int:event_id>", methods=["PUT"])
 @require_auth
-@require_role("admin", "moderator", "club_coordinator")
+@require_role("admin", "developer")
 def update_event(event_id: int):
     event = Event.query.get(event_id)
     if not event:
@@ -212,7 +212,7 @@ def update_event(event_id: int):
 
 @events_bp.route("/<int:event_id>", methods=["DELETE"])
 @require_auth
-@require_role("admin", "moderator")
+@require_role("admin", "developer")
 def delete_event(event_id: int):
     event = Event.query.get(event_id)
     if not event:
@@ -224,7 +224,7 @@ def delete_event(event_id: int):
 
 @events_bp.route("/<int:event_id>/albums", methods=["POST"])
 @require_auth
-@require_role("admin", "moderator", "club_coordinator")
+@require_role("admin", "developer")
 def create_album(event_id: int):
     event = Event.query.get(event_id)
     if not event:
@@ -257,10 +257,10 @@ def upload_event_media(event_id: int):
     if not event:
         raise NotFoundError("Event not found.")
 
-    # Permissions check: admins, moderators, club coordinators, or permitted students
+    # Permissions check: only admins and developers can upload event media
     user = g.current_user
-    if not user.can_manage_events() and user.role not in ("student", "user"):
-        raise ForbiddenError("You do not have permission to upload media to this event.")
+    if user.role not in ("admin", "developer"):
+        raise ForbiddenError("Only administrators and developers can upload media to events.")
 
     album_id = None
     caption = ""

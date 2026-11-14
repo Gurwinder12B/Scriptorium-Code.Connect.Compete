@@ -27,6 +27,7 @@ import {
 
 export const QuizDiscoveryPage: React.FC = () => {
   const { user } = useAuth();
+  const canCreateQuiz = Boolean(user && (user.role === 'admin' || user.role === 'developer'));
   const [quizzes, setQuizzes] = useState<QuizItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
@@ -196,13 +197,15 @@ export const QuizDiscoveryPage: React.FC = () => {
             Form teams, battle through time-limited technical quizzes, and get instant scored evaluations with official answer keys and transparent solution breakdowns.
           </p>
           <div className="pt-2 flex flex-wrap items-center gap-4">
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-bold rounded-xl text-sm shadow-md transition transform hover:-translate-y-0.5"
-            >
-              <Plus className="w-4 h-4" />
-              Organize Custom Quiz
-            </button>
+            {canCreateQuiz && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-bold rounded-xl text-sm shadow-md transition transform hover:-translate-y-0.5"
+              >
+                <Plus className="w-4 h-4" />
+                Organize Custom Quiz
+              </button>
+            )}
             <Link
               to="/leaderboard"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl text-sm border border-white/20 transition"
@@ -320,15 +323,17 @@ export const QuizDiscoveryPage: React.FC = () => {
           <Award className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto" />
           <h3 className="text-lg font-bold text-slate-900 dark:text-white">No quiz competitions found</h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-            Try adjusting your search criteria or organize the first technical quiz competition for your club!
+            Try adjusting your search criteria or explore upcoming quizzes.
           </p>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-xl text-xs font-semibold"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Create Competition
-          </button>
+          {canCreateQuiz && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-xl text-xs font-semibold"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Create Competition
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

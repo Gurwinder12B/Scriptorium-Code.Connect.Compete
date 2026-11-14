@@ -57,7 +57,7 @@ export const EventDetailPage: React.FC = () => {
   const [albumDescription, setAlbumDescription] = useState('');
   const [creatingAlbum, setCreatingAlbum] = useState(false);
 
-  const canManage = user && ['admin', 'moderator', 'club_coordinator'].includes(user.role);
+  const canManage = Boolean(user && ['admin', 'developer'].includes(user.role));
 
   const loadEvent = async () => {
     if (!id) return;

@@ -40,8 +40,8 @@ def change_user_role(user_id):
 
     data = request.get_json() or {}
     new_role = data.get("role")
-    if new_role not in ("user", "moderator", "admin"):
-        raise ValidationError("Role must be 'user', 'moderator', or 'admin'.")
+    if new_role not in ("user", "developer", "moderator", "admin"):
+        raise ValidationError("Role must be 'user', 'developer', 'moderator', or 'admin'.")
 
     user.role = new_role
     if "is_active" in data:

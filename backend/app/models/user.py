@@ -8,7 +8,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False, index=True)
     email = db.Column(db.String(255), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default="user") # 'guest', 'user', 'moderator', 'admin'
+    role = db.Column(db.String(20), nullable=False, default="user") # 'user', 'developer', 'moderator', 'admin'
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
@@ -21,13 +21,13 @@ class User(db.Model):
     progress_records = db.relationship("UserProblemProgress", back_populates="user", cascade="all, delete-orphan")
 
     def can_manage_events(self):
-        return self.role in ("admin", "moderator", "club_coordinator")
+        return self.role in ("admin", "developer")
 
     def can_manage_blogs(self):
-        return self.role in ("admin", "moderator", "editor")
+        return self.role in ("admin", "moderator", "editor", "developer")
 
     def is_privileged(self):
-        return self.role in ("admin", "moderator")
+        return self.role in ("admin", "developer", "moderator")
 
     def to_dict(self):
         return {

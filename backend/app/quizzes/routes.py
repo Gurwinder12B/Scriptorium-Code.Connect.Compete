@@ -26,7 +26,7 @@ def list_quizzes():
     query = Quiz.query
 
     user = getattr(g, "current_user", None)
-    is_admin_or_mod = user and user.role in ("admin", "moderator", "club_coordinator")
+    is_admin_or_mod = user and user.role in ("admin", "developer", "moderator")
     if not is_admin_or_mod:
         query = query.filter_by(is_published=True)
 
@@ -69,7 +69,7 @@ def get_quiz(id_or_slug):
         raise NotFoundError("Quiz not found")
 
     user = getattr(g, "current_user", None)
-    is_admin = user and user.role in ("admin", "moderator", "club_coordinator")
+    is_admin = user and user.role in ("admin", "developer", "moderator")
     
     # Students taking quiz get questions without the answer key. Admins get full answer key.
     include_answer_key = is_admin and (request.args.get("reveal_answer_key", "false").lower() == "true")
@@ -78,11 +78,9 @@ def get_quiz(id_or_slug):
     return success_response(data=data)
 
 @quizzes_bp.route("", methods=["POST"])
-@require_auth
+@require_role("admin", "developer")
 def create_quiz():
     user = getattr(g, "current_user", None)
-    if user.role not in ("admin", "moderator", "club_coordinator", "author"):
-        raise ForbiddenError("Only administrators, club coordinators, or moderators can create quiz competitions.")
 
     payload = request.get_json() or {}
     title = payload.get("title", "").strip()
@@ -147,15 +145,13 @@ def create_quiz():
     return created_response(data=quiz.to_dict(include_questions=True, include_answer_key=True), message="Quiz competition created successfully with answer key.")
 
 @quizzes_bp.route("/<int:quiz_id>", methods=["PUT"])
-@require_auth
+@require_role("admin", "developer")
 def update_quiz(quiz_id):
     quiz = Quiz.query.get(quiz_id)
     if not quiz:
         raise NotFoundError("Quiz not found")
 
     user = getattr(g, "current_user", None)
-    if user.role not in ("admin", "moderator") and quiz.created_by_id != user.id:
-        raise ForbiddenError("Permission denied to edit this quiz.")
 
     payload = request.get_json() or {}
     if "title" in payload:
@@ -211,15 +207,11 @@ def update_quiz(quiz_id):
     return success_response(data=quiz.to_dict(include_questions=True, include_answer_key=True), message="Quiz updated successfully.")
 
 @quizzes_bp.route("/<int:quiz_id>", methods=["DELETE"])
-@require_auth
+@require_role("admin", "developer")
 def delete_quiz(quiz_id):
     quiz = Quiz.query.get(quiz_id)
     if not quiz:
         raise NotFoundError("Quiz not found")
-
-    user = getattr(g, "current_user", None)
-    if user.role != "admin" and quiz.created_by_id != user.id:
-        raise ForbiddenError("Only admins or quiz creator can delete this quiz.")
 
     db.session.delete(quiz)
     db.session.commit()

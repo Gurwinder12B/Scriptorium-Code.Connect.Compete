@@ -986,6 +986,10 @@ def seed_database(target_app=None):
             dev_user = User.query.filter_by(username="developer").first()
             student_user = User.query.filter_by(username="student").first()
 
+            if dev_user and dev_user.role != "developer":
+                dev_user.role = "developer"
+                db.session.commit()
+
             if not Event.query.first():
                 print("Seeding missing events into existing database...")
                 _seed_events(admin_user, dev_user)
@@ -1014,7 +1018,7 @@ def seed_database(target_app=None):
         users = [
             ("admin", "admin@scriptorium.dev", "Admin123!", "admin", "Platform Administrator", "System admin and lead architect at Scriptorium."),
             ("moderator", "moderator@scriptorium.dev", "Mod123!", "moderator", "Community Moderator", "Ensuring high quality, respectful and safe technical discussions."),
-            ("developer", "developer@scriptorium.dev", "User123!", "user", "Alex Chen", "Full-stack engineer passionate about clean code and algorithms."),
+            ("developer", "developer@scriptorium.dev", "User123!", "developer", "Alex Chen", "Full-stack engineer passionate about clean code and algorithms."),
             ("student", "student@scriptorium.dev", "User123!", "user", "Maya Patel", "Computer science student learning data structures.")
         ]
 

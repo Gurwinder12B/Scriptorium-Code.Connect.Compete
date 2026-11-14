@@ -1,6 +1,7 @@
 export type UserRole =
   | 'guest'
   | 'user'
+  | 'developer'
   | 'student'
   | 'author'
   | 'editor'

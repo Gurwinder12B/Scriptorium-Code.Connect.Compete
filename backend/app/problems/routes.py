@@ -185,7 +185,7 @@ def get_problem_hints(id_or_slug):
     return success_response(data=hints)
 
 @problems_bp.route("", methods=["POST"])
-@require_role("admin", "moderator")
+@require_role("admin", "developer")
 def create_problem():
     data = request.get_json() or {}
     title = (data.get("title") or "").strip()
@@ -251,7 +251,7 @@ def create_problem():
     return success_response(data=problem.to_dict(include_test_cases=True, include_hidden_tests=True), status_code=201)
 
 @problems_bp.route("/<int:problem_id>", methods=["PUT"])
-@require_role("admin", "moderator")
+@require_role("admin", "developer")
 def update_problem(problem_id):
     problem = Problem.query.get(problem_id)
     if not problem:
@@ -279,7 +279,7 @@ def update_problem(problem_id):
     return success_response(data=problem.to_dict())
 
 @problems_bp.route("/<int:problem_id>/test-cases", methods=["POST"])
-@require_role("admin", "moderator")
+@require_role("admin", "developer")
 def add_test_cases(problem_id):
     problem = Problem.query.get(problem_id)
     if not problem:
@@ -302,4 +302,15 @@ def add_test_cases(problem_id):
 
     db.session.commit()
     return success_response(data={"message": f"Added test cases for problem {problem_id}."})
+
+@problems_bp.route("/<int:problem_id>", methods=["DELETE"])
+@require_role("admin", "developer")
+def delete_problem(problem_id):
+    problem = Problem.query.get(problem_id)
+    if not problem:
+        raise NotFoundError("Problem not found.")
+
+    db.session.delete(problem)
+    db.session.commit()
+    return success_response(message="Problem deleted successfully.")
 

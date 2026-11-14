@@ -46,7 +46,7 @@ export const EventGalleryPage: React.FC = () => {
   const [newCoverUrl, setNewCoverUrl] = useState('');
   const [creating, setCreating] = useState(false);
 
-  const canCreate = user && ['admin', 'moderator', 'club_coordinator'].includes(user.role);
+  const canCreate = Boolean(user && ['admin', 'developer'].includes(user.role));
 
   useEffect(() => {
     async function loadEvents() {
