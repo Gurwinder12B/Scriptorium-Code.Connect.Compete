@@ -52,12 +52,13 @@ def create_app(config_name=None):
     app.register_blueprint(clubs_bp)
     app.register_blueprint(quizzes_bp)
 
-    # Ensure tables are created automatically
-    with app.app_context():
-        try:
-            db.create_all()
-        except Exception as e:
-            app.logger.warning(f"Could not auto-create tables: {e}")
+    # Ensure tables are created automatically (avoid blocking cold starts on Vercel)
+    if not os.getenv("VERCEL"):
+        with app.app_context():
+            try:
+                db.create_all()
+            except Exception as e:
+                app.logger.warning(f"Could not auto-create tables: {e}")
 
     # Health check & system discovery endpoints
     @app.route("/", methods=["GET"])

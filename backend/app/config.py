@@ -10,7 +10,7 @@ class Config:
     JWT_EXPIRATION = timedelta(minutes=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES_MINUTES", "1440")))
     
     # Database config: Neon PostgreSQL, external cloud DB, or SQLite fallback
-    raw_db_url = os.getenv("DATABASE_URL", "").strip()
+    raw_db_url = os.getenv("DATABASE_URL", "").strip().strip('"').strip("'")
     if raw_db_url.startswith("postgres://"):
         raw_db_url = raw_db_url.replace("postgres://", "postgresql://", 1)
     elif not raw_db_url:
@@ -19,13 +19,26 @@ class Config:
             raw_db_url = "sqlite:////tmp/scriptorium.db"
         else:
             raw_db_url = "sqlite:///scriptorium.db"
+
+    # In serverless environments, pg8000 is pure Python (no C dependencies / no libpq.so)
+    if raw_db_url.startswith("postgresql://") and not raw_db_url.startswith("postgresql+"):
+        try:
+            import psycopg2
+        except Exception:
+            raw_db_url = raw_db_url.replace("postgresql://", "postgresql+pg8000://", 1)
+
     DATABASE_URL = raw_db_url
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {
+
+    engine_opts = {
         "pool_pre_ping": True,
         "pool_recycle": 300,
     }
+    if "pg8000" in raw_db_url:
+        engine_opts["connect_args"] = {"ssl_context": True}
+
+    SQLALCHEMY_ENGINE_OPTIONS = engine_opts
 
     # Media & Uploads
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
